@@ -15,15 +15,12 @@ class MonitorView : public QObject
     Q_OBJECT
 public:
     explicit MonitorView(QObject* parent = 0);
-    void initialize(Monitor* const monitor,
-                    QTextBrowser* const messageBrowser,
-                    QPushButton* const clearButton,
-                    QPushButton* const toggleConnectionButton);
+    void initialize(Monitor* monitor);
 
 private:
     Monitor* monitor;
     QTextBrowser* messageBrowser;
-    const QPushButton* clearButton;
+    QPushButton* clearButton;
     QPushButton* toggleConnectionButton;
 
 signals:

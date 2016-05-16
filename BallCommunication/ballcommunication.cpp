@@ -78,11 +78,9 @@ void BallCommunication::processRawBallData(){
     // Send signal about receiving data
     emit DataReceived();
 }
-#include <QDir>
-#include <QDebug>
+
 void BallCommunication::OpenConnection()
 {
-    qDebug() << QDir::currentPath();
     /* Initialize SDL_net */
     if ( SDLNet_Init() < 0 ){
         printf("SDL_netの初期化に失敗しました: %s\n", SDLNet_GetError());
