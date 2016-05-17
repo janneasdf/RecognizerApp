@@ -4,42 +4,34 @@
 #include "mainwindow.h"
 #include <qapplication.h>
 
-MonitorView::MonitorView(QObject *parent) : QObject(parent)
+MonitorView::MonitorView(QWidget *parent) : QWidget(parent), ui(new Ui::MonitorView)
 {
-
+    ui->setupUi(this);
 }
 
 void MonitorView::initialize(Monitor* monitor)
 {
-//    MainWindow& mw = (MainWindow)parent;
-//    this->monitor = qApp::activeWindow();
-//    this->messageBrowser = messageBrowser;
-//    this->clearButton = clearButton;
-
-//    connect(clearButton, SIGNAL(clicked(bool)), this, SLOT(clearButtonPressed()));
-//    connect(monitor, SIGNAL(connectionStarted(QString)), this, SLOT(onConnectionStarted(QString)));
-//    connect(monitor, SIGNAL(connectionEnded(QString)), this, SLOT(onConnectionEnded(QString)));
-//    connect(toggleConnectionButton, SIGNAL(clicked(bool)), this, SLOT(toggleConnectionButtonPressed()));
+    this->monitor = monitor;
+    connect(ui->clearButton, SIGNAL(clicked(bool)), this, SLOT(clearButtonPressed()));
+    connect(monitor, SIGNAL(connectionStarted(QString)), this, SLOT(onConnectionStarted(QString)));
+    connect(monitor, SIGNAL(connectionEnded(QString)), this, SLOT(onConnectionEnded(QString)));
+    connect(ui->toggleConnectionButton, SIGNAL(clicked(bool)), this, SLOT(toggleConnectionButtonPressed()));
 }
-#include <qthread.h>
-#include <qapplication.h>
 void MonitorView::onConnectionStarted(const QString& message)
 {
-    qDebug() << QThread::currentThread();
-    qDebug() << QApplication::instance()->thread();
-    messageBrowser->append(message);
-    toggleConnectionButton->setText("Close connection");
+    ui->logBrowser->append(message);
+    ui->toggleConnectionButton->setText("Close connection");
 }
 
 void MonitorView::onConnectionEnded(const QString& message)
 {
-    messageBrowser->append(message);
-    toggleConnectionButton->setText("Open connection");
+    ui->logBrowser->append(message);
+    ui->toggleConnectionButton->setText("Open connection");
 }
 
 void MonitorView::clearButtonPressed()
 {
-    messageBrowser->clear();
+    ui->logBrowser->clear();
 }
 
 void MonitorView::toggleConnectionButtonPressed()

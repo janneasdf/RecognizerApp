@@ -18,11 +18,7 @@ class BallCommunication : public QObject
     Q_OBJECT
 
 public:
-    static BallCommunication* getInstance()
-    {
-        static BallCommunication instance;
-        return &instance;
-    }
+    static BallCommunication* getInstance();
 
     void OpenConnection();
     void CloseConnection(bool clearData);

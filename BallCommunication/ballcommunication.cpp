@@ -8,11 +8,11 @@
 
 // TODO: separate config reading and raw data processing to another class
 
-//BallCommunication::BallCommunication(QObject* parent) : QObject(parent)
-//{
-//    communicationTimer = Timer::getInstance();
-//}
-
+BallCommunication *BallCommunication::getInstance()
+{
+    static BallCommunication instance;
+    return &instance;
+}
 
 void BallCommunication::receiveData()
 {

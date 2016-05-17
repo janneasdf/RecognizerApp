@@ -2,7 +2,7 @@
 #define MONITORVIEW_H
 
 #include "monitor.h"
-
+#include "ui_monitorview.h"
 #include <QObject>
 #include <qtextbrowser.h>
 #include <qpushbutton.h>
@@ -10,19 +10,16 @@
 
 using std::shared_ptr;
 
-class MonitorView : public QObject
+class MonitorView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MonitorView(QObject* parent = 0);
+    explicit MonitorView(QWidget* parent = 0);
     void initialize(Monitor* monitor);
 
 private:
     Monitor* monitor;
-    QTextBrowser* messageBrowser;
-    QPushButton* clearButton;
-    QPushButton* toggleConnectionButton;
-
+    Ui::MonitorView* ui;
 signals:
 
 public slots:

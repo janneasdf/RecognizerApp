@@ -38,8 +38,7 @@ SOURCES += main.cpp\
     GestureRecognition/gesturerecognition.cpp \
     mainlogic.cpp \
     monitor.cpp \
-    monitorview.cpp \
-    form.cpp
+    monitorview.cpp
 
 HEADERS  += mainwindow.h \
     BallCommunication/Networking/BallCommunicator/BallCommunicator.h \
@@ -56,8 +55,7 @@ HEADERS  += mainwindow.h \
     GestureRecognition/gesturerecognition.h \
     mainlogic.h \
     monitor.h \
-    monitorview.h \
-    form.h
+    monitorview.h
 
 FORMS    += mainwindow.ui \
-    form.ui
+    monitorview.ui
