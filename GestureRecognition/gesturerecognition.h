@@ -2,27 +2,43 @@
 #define GESTURERECOGNITION_H
 
 #include <string>
+#include <vector>
 #include <iostream>
 #include <QObject>
+#include "recognizer.h"
 
 using std::string;
+using std::vector;
 
-class GestureRecognition : QObject
+/* This class is an easy interface between GUI and logic for gesture recognition.
+ * The logic for training and recognition is handled by the Recognizer class.
+ *
+ */
+class GestureRecognition : public QObject
 {
     Q_OBJECT
 public:
-    GestureRecognition();
+    explicit GestureRecognition(QObject* parent = 0);
 
-    void TrainFromData(const string& filename);
-    void SetParameters();
+    // Training related functions
+    void setParameters();
 
-    void StartRecognition();
-    void StopRecognition();
-    void RestartGestureRecognition();
+    // Real-time recognition related functions
+    void startRecognition();
+    void stopRecognition();
+    void restartGestureRecognition();
+
+private:
+    Recognizer recognizer;
+
+public slots:
+    void trainFromData(const QString& dataFolder, const QStringList& filenames);
 
 signals:
-    void GestureRecognitionResult(string result);
-
+    void gestureRecognitionResult(string result);
+    void trainingStarted();
+    void trainingCompleted();
+    void trainingError(const QString& error);
 
 };
 

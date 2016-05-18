@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "monitorview.h"
 #include "monitor.h"
+#include "monitorview.h"
 #include "training.h"
 #include "trainingview.h"
 #include <memory>
@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
 
     Monitor* monitor = new Monitor(this);
     MonitorView* monitorView = new MonitorView(this);

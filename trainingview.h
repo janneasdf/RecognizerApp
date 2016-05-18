@@ -3,6 +3,7 @@
 
 #include "training.h"
 #include <QWidget>
+#include <qstringlistmodel.h>
 
 namespace Ui {
 class trainingView;
@@ -21,13 +22,25 @@ public:
     void initialize(Training* training);
 
 private:
+    void initializeListViews();
+
     Training* training;
     Ui::trainingView *ui;
 
+    QStringListModel* trainingFilesModel = NULL;
+    QStringListModel* trainedModelsModel = NULL;
+
     // Folder path for training data files
-    const string trainingFilesFolder = "./data/training_files";
+    const QString trainingFilesFolder = "./data/training_files/";
     // Folder path for trained gesture recognition models (HMM)
-    const string trainedModelsFolder = "./data/trained_models";
+    const QString trainedModelsFolder = "./data/trained_models/";
+
+public slots:
+    void onTrainingStarted();
+    void onTrainingCompleted();
+
+private slots:
+    void startTraining();
 };
 
 #endif // TRAININGVIEW_H

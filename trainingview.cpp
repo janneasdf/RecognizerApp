@@ -1,7 +1,6 @@
 #include "trainingview.h"
 #include "ui_trainingview.h"
 #include <qdir.h>
-#include <qstringlistmodel.h>
 
 TrainingView::TrainingView(QWidget *parent) :
     QWidget(parent),
@@ -13,35 +12,68 @@ TrainingView::TrainingView(QWidget *parent) :
 void TrainingView::initialize(Training *training)
 {
     this->training = training;
+    QObject::connect(training, SIGNAL(trainingStarted()), this, SLOT(onTrainingStarted()), Qt::UniqueConnection);
+    QObject::connect(training, SIGNAL(trainingCompleted()), this, SLOT(onTrainingCompleted()), Qt::UniqueConnection);
+    QObject::connect(ui->trainButton, SIGNAL(clicked(bool)), this, SLOT(startTraining()), Qt::UniqueConnection);
+    initializeListViews();
+}
 
+void TrainingView::initializeListViews()
+{
     // Read training data filenames and populate listview
-    // Note: training data has x.dat and x_events.dat files
-    QDir trainingDataDir(QString(trainingFilesFolder.c_str()));
+    // Note: training data has x.dat and x_events.dat files, we search for "x"
+    QDir trainingDataDir(trainingFilesFolder);
     QStringList trainingFiles = trainingDataDir.entryList(QDir::Files);
-    QStringList dataFiles;
+    QStringList dataFileBaseNames;
     for (const QString& trainingFile : trainingFiles)
     {
         if (!trainingFile.endsWith("_events.dat") && trainingFile.endsWith(".dat"))
         {
-            QString matchingEventsFile = trainingFile.split('.')[0] + "_events.dat";
+            // Filename without ".dat"
+            QString trainingFileBaseName = trainingFile.split('.')[0];
+            QString matchingEventsFile = trainingFileBaseName + "_events.dat";
             for (const QString& file : trainingFiles)
             {
                 if (file.endsWith("_events.dat") && file.compare(matchingEventsFile) == 0)
                 {
-                    dataFiles.append(trainingFile);
+                    dataFileBaseNames.append(trainingFileBaseName);
                     break;
                 }
             }
         }
     }
-    QStringListModel* trainingFilesModel = new QStringListModel(dataFiles);
+    if (trainingFilesModel)
+        delete trainingFilesModel;
+    trainingFilesModel = new QStringListModel(dataFileBaseNames);
     ui->trainingFilesList->setModel(trainingFilesModel);
 
     // Read trained model filenames and populate listview
-    QDir trainedModelsDir(QString(trainedModelsFolder.c_str()));
+    QDir trainedModelsDir(trainedModelsFolder);
     QStringList trainedModels = trainedModelsDir.entryList(QDir::Files);
-    QStringListModel* trainedModelsModel = new QStringListModel(trainedModels);
+    trainedModelsModel = new QStringListModel(trainedModels);
     ui->trainedModelsList->setModel(trainedModelsModel);
+}
+
+void TrainingView::onTrainingStarted()
+{
+    ui->trainButton->setDisabled(true);
+    ui->trainButton->setText("Training...");
+}
+
+void TrainingView::onTrainingCompleted()
+{
+    ui->trainButton->setDisabled(false);
+    ui->trainButton->setText("Train model \non selected");
+}
+
+void TrainingView::startTraining()
+{
+    QStringList selectedTrainingFiles;
+    for (const QModelIndex& index : ui->trainingFilesList->selectionModel()->selectedIndexes())
+    {
+        selectedTrainingFiles.append(index.data().toString());
+    }
+    training->trainWithData(trainingFilesFolder, selectedTrainingFiles);
 }
 
 TrainingView::~TrainingView()
