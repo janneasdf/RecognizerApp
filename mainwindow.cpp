@@ -5,9 +5,13 @@
 #include "training.h"
 #include "trainingview.h"
 #include "recognitionview.h"
+#include "BallCommunication/ballcommunication.h"
+#include "BallCommunication/ballcommunicationfake.h"
 #include <memory>
 
 using std::shared_ptr;
+
+#define FAKE_COMMUNICATION 1
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,7 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     TrainingView* trainingView = new TrainingView(this);
     trainingView->initialize(training);
 
+#if FAKE_COMMUNICATION
+    BallCommunicationBase* ballCommunication = new BallCommunicationFake(this);
+#else
+    BallCommunicationBase* ballCommunication = new BallCommunication(this);
+#endif
     Monitor* monitor = new Monitor(this);
+    monitor->initialize(ballCommunication);
+
     MonitorView* monitorView = new MonitorView(this);
     monitorView->initialize(monitor);
 

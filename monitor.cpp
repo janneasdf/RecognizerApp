@@ -4,22 +4,38 @@
 
 Monitor::Monitor(QObject *parent) : QObject(parent)
 {
-    ballCommunication = BallCommunication::getInstance();
-    connect(ballCommunication, SIGNAL(ConnectionOpened(QString)),
+
+}
+
+void Monitor::initialize(BallCommunicationBase *ballCommunication)
+{
+    this->ballCommunication = ballCommunication;
+    connect(ballCommunication, SIGNAL(connectionOpened(QString)),
                      this, SIGNAL(connectionStarted(QString)));
-    connect(ballCommunication, SIGNAL(ConnectionClosed(QString)),
+    connect(ballCommunication, SIGNAL(connectionClosed(QString)),
                      this, SIGNAL(connectionEnded(QString)));
-    connect(ballCommunication, SIGNAL(DataReceived(float,float,float)), this, SLOT(receiveData(float,float,float)));
+    connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(receiveData(float,float,float)));
 }
 
 void Monitor::tryStartConnection()
 {
-    ballCommunication->OpenConnection();
+    if (!ballCommunication)
+        return;
+    ballCommunication->openConnection();
 }
 
 void Monitor::endConnection()
 {
-    ballCommunication->CloseConnection(true);
+    if (!ballCommunication)
+        return;
+    ballCommunication->closeConnection(true);
+}
+
+bool Monitor::isConnectionActive()
+{
+    if (!ballCommunication)
+        return false;
+    return ballCommunication->isConnectionActive();
 }
 
 void Monitor::receiveData(float timestamp, float acceleration, float gyro)

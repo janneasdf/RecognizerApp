@@ -36,7 +36,7 @@ void MonitorView::clearButtonPressed()
 
 void MonitorView::toggleConnectionButtonPressed()
 {
-    if (monitor->IsConnectionActive())
+    if (monitor->isConnectionActive())
     {
         monitor->endConnection();
     }

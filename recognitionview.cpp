@@ -41,25 +41,25 @@ void RecognitionView::initialize(Monitor *monitor)
 void RecognitionView::updateGraph(float timestamp, float acceleration, float gyro)
 {
     // calculate two new data points:
-    double key = timestamp;
+    double time = 0.001 * timestamp;
     static double lastPointKey = 0;
-    if (key-lastPointKey > 10) // at most add point every 10 ms
+    if (time-lastPointKey > 0.01) // at most add point every 10 ms
     {
       double value0 = acceleration;
       double value1 = gyro;
       // add data to lines:
-      sensorPlot->graph(0)->addData(key, value0);
-      sensorPlot->graph(1)->addData(key, value1);
+      sensorPlot->graph(0)->addData(time, value0);
+      sensorPlot->graph(1)->addData(time, value1);
       // remove data of lines that's outside visible range:
-      sensorPlot->graph(0)->removeDataBefore(key-8);
-      sensorPlot->graph(1)->removeDataBefore(key-8);
+      sensorPlot->graph(0)->removeDataBefore(time-8);
+      sensorPlot->graph(1)->removeDataBefore(time-8);
       // rescale value (vertical) axis to fit the current data:
       sensorPlot->graph(0)->rescaleValueAxis();
       sensorPlot->graph(1)->rescaleValueAxis(true);
-      lastPointKey = key;
+      lastPointKey = time;
     }
     // make key axis range scroll with the data (at a constant range size of 8):
-    sensorPlot->xAxis->setRange(key+0.25, 8, Qt::AlignRight);
+    sensorPlot->xAxis->setRange(time+0.25, 8, Qt::AlignRight);
     sensorPlot->replot();
 }
 

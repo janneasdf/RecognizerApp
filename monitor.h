@@ -11,12 +11,14 @@ class Monitor : public QObject
 public:
     explicit Monitor(QObject *parent = 0);
 
+    void initialize(BallCommunicationBase* ballCommunication);
+
     void tryStartConnection();
     void endConnection();
-    bool IsConnectionActive() { return ballCommunication->IsConnectionActive(); }
+    bool isConnectionActive();
 
 private:
-    BallCommunication* ballCommunication;
+    BallCommunicationBase* ballCommunication;
 
 signals:
     void connectionStarted(const QString& connectionInfo);

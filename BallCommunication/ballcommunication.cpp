@@ -6,12 +6,14 @@
 #include "Networking/Network/Network.h"
 #include "Networking/BallCommunicator/BallCommunicator_UDP.h"
 
-// TODO: separate config reading and raw data processing to another class
-
-BallCommunication *BallCommunication::getInstance()
+BallCommunication::BallCommunication(QObject *parent) : BallCommunicationBase(parent)
 {
-    static BallCommunication instance;
-    return &instance;
+    communicationTimer = Timer::getInstance();
+}
+
+BallCommunication::~BallCommunication()
+{
+    closeConnection(true);
 }
 
 void BallCommunication::readData()
@@ -20,7 +22,7 @@ void BallCommunication::readData()
     processRawBallData();
 }
 
-void BallCommunication::OpenConnection()
+void BallCommunication::openConnection()
 {
     /* Initialize SDL_net */
     if ( SDLNet_Init() < 0 ){
@@ -95,10 +97,10 @@ void BallCommunication::OpenConnection()
     connectionActive = true;
 
     // Emit signal about opened connection
-    emit ConnectionOpened(QString("Opened connection"));
+    emit connectionOpened(QString("Opened connection"));
 }
 
-void BallCommunication::CloseConnection(bool clearData)
+void BallCommunication::closeConnection(bool clearData)
 {
 //    for (int i = 0; i < MAX_ELECTRODES; i++) {
 //        touchedSE[i].releaseSE();
@@ -127,11 +129,11 @@ void BallCommunication::CloseConnection(bool clearData)
     connectionActive = false;
 
     // Emit signal about connection closing
-    emit ConnectionClosed(QString("Closed connection"));
+    emit connectionClosed(QString("Closed connection"));
 }
 
 /* ボールデータの処理 */
-void BallCommunication::processRawBallData(){
+void BallCommunication::processRawBallData() {
     // Ask ballcommunicator to read the new data from the ball's sensors
     string errorMessage;
     bool receiveSuccessful = ballCommunicator.receiveRawBallData(errorMessage) == 0;
@@ -175,15 +177,5 @@ void BallCommunication::processRawBallData(){
     processedData.push_back(newProcessedBallData);
 
     // Send signal about receiving data
-    emit DataReceived(newProcessedBallData.t, newProcessedBallData.accelerationXYZNoG, newProcessedBallData.gyroXYZ);
-}
-
-BallCommunication::BallCommunication(QObject *parent) : QObject(parent)
-{
-    communicationTimer = Timer::getInstance();
-}
-
-BallCommunication::~BallCommunication()
-{
-    CloseConnection(true);
+    emit dataReceived(newProcessedBallData.t, newProcessedBallData.accelerationXYZNoG, newProcessedBallData.gyroXYZ);
 }

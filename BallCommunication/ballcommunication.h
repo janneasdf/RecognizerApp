@@ -9,34 +9,24 @@
 #include <vector>
 #include <string>
 #include <qobject.h>
+#include "ballcommunicationbase.h"
 
 using std::vector;
 using std::string;
 
-class BallCommunication : public QObject
+class BallCommunication : public BallCommunicationBase
 {
     Q_OBJECT
-
 public:
-    static BallCommunication* getInstance();
-
-    void OpenConnection();
-    void CloseConnection(bool clearData);
-    bool IsConnectionActive() { return connectionActive; }
-
-    // Delete possibility of accidental copies
-    BallCommunication(const BallCommunication&) = delete;
-    void operator=(const BallCommunication&) = delete;
-
-private:
     explicit BallCommunication(QObject* parent = 0);
     ~BallCommunication();
 
+    void openConnection() override;
+    void closeConnection(bool clearData) override;
+
+private:
     const int dataReadInterval = 60; // milliseconds
 
-    bool connectionActive = false;
-
-    //
     void processRawBallData();
 
     // Communicator for communicating with ball and receiving data
@@ -65,12 +55,6 @@ private:
     const string configFilepath = "./data/conf/communicator.conf";
     const string accelOffsetFilepathFormat = "./data/conf/accelerationOffset%d.dat";
     const string gyroOffsetFilepathFormat = "./data/conf/gyroOffset%d.dat";
-
-signals:
-    void ConnectionOpened(const QString& message);
-    void ConnectionClosed(const QString& message);
-    void DataReceived(float timestamp, float acceleration, float gyro); // todo decide if parameters or not, also where is "all data" kept
-    void dataReadError(const QString& message);
 
 private slots:
     void readData();
