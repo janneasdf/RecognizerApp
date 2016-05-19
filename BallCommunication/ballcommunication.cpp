@@ -14,69 +14,10 @@ BallCommunication *BallCommunication::getInstance()
     return &instance;
 }
 
-void BallCommunication::receiveData()
+void BallCommunication::readData()
 {
     // Get newly received data, apply calibration, store it
     processRawBallData();
-}
-
-/* ボールデータの処理 */
-void BallCommunication::processRawBallData(){
-    /* グラフ用にセンサデータを記録する */
-    RawBallData receivedRawBallData = ballCommunicator.getRawBallData();
-    ProcessedBallData processedBallData = ballCommunicator.getProcessedBallData();
-    int currentBallID = 0;
-
-    /* センサグラフデータ追加 */
-    float tmpX, tmpY, tmpZ;
-    tmpX = receivedRawBallData.acceleration.x - sensorOffsetData[currentBallID].accelerationOffset.x;
-    tmpY = receivedRawBallData.acceleration.y - sensorOffsetData[currentBallID].accelerationOffset.y;
-    tmpZ = receivedRawBallData.acceleration.z - sensorOffsetData[currentBallID].accelerationOffset.z;
-    processedBallData.accelerationXYZ = sqrtf(tmpX * tmpX + tmpY * tmpY + tmpZ * tmpZ);
-
-    tmpX = receivedRawBallData.gyro.x - sensorOffsetData[currentBallID].gyroOffset.x;
-    tmpY = receivedRawBallData.gyro.y - sensorOffsetData[currentBallID].gyroOffset.y;
-    tmpZ = receivedRawBallData.gyro.z - sensorOffsetData[currentBallID].gyroOffset.z;
-    processedBallData.gyroXYZ = sqrtf(tmpX * tmpX + tmpY * tmpY + tmpZ * tmpZ);
-
-    /* 加速度 */
-//    graphAccelerationXYZ.addData(processedBallData.accelerationXYZ, currentSensorValueIndex);
-//    graphAccelerationX.addData(receivedRawBallData.acceleration.x, currentSensorValueIndex);
-//    graphAccelerationY.addData(receivedRawBallData.acceleration.y, currentSensorValueIndex);
-//    graphAccelerationZ.addData(receivedRawBallData.acceleration.z, currentSensorValueIndex);
-
-    /* 加速度 */
-//    compassXYZ.addData(processedBallData.compassXYZ, currentSensorValueIndex);
-//    compassX.addData(receivedRawBallData.compass.x, currentSensorValueIndex);
-//    compassY.addData(receivedRawBallData.compass.y, currentSensorValueIndex);
-//    compassZ.addData(receivedRawBallData.compass.z, currentSensorValueIndex);
-
-    /* ジャイロ */
-//    graphGyroX.addData(receivedRawBallData.gyro.x, currentSensorValueIndex);
-//    graphGyroY.addData(receivedRawBallData.gyro.y, currentSensorValueIndex);
-//    graphGyroZ.addData(receivedRawBallData.gyro.z, currentSensorValueIndex);
-
-    /* アナログセンサ */
-    //graphMic.addData(receivedRawBallData.micValue, currentSensorValueIndex);
-    //graphPressure.addData(receivedRawBallData.pressure - GRAPH_OFFSET_PRESSURE_SENSOR, currentSensorValueIndex);
-    //graphPhotoSensor1.addData(receivedRawBallData.photoSensor1, currentSensorValueIndex);
-
-    // Store received data
-    RawBallData newRawData = receivedRawBallData;
-    newRawData.t = communicationTimer->systemTime - connectionStartedTime;
-    rawData.push_back(newRawData);
-    ProcessedBallData newProcessedBallData = processedBallData;
-    newProcessedBallData.t = communicationTimer->systemTime - connectionStartedTime;
-    processedData.push_back(newProcessedBallData);
-
-    /* グラフの現在位置をずらす */
-//    currentSensorValueIndex++;
-//    if (currentSensorValueIndex >= WINDOW_WIDTH){
-//        currentSensorValueIndex = 0;
-//    }
-
-    // Send signal about receiving data
-    emit DataReceived();
 }
 
 void BallCommunication::OpenConnection()
@@ -148,8 +89,8 @@ void BallCommunication::OpenConnection()
         }
     }
 
-    QObject::connect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
-    dataReadTimer.start(30);
+    QObject::connect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(readData()));
+    dataReadTimer.start(dataReadInterval);
 
     connectionActive = true;
 
@@ -174,7 +115,7 @@ void BallCommunication::CloseConnection(bool clearData)
     SDLNet_Quit();
     SDL_Quit();
 
-    QObject::disconnect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
+    QObject::disconnect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(readData()));
     dataReadTimer.stop();
 
     if (clearData)
@@ -187,6 +128,54 @@ void BallCommunication::CloseConnection(bool clearData)
 
     // Emit signal about connection closing
     emit ConnectionClosed(QString("Closed connection"));
+}
+
+/* ボールデータの処理 */
+void BallCommunication::processRawBallData(){
+    // Ask ballcommunicator to read the new data from the ball's sensors
+    string errorMessage;
+    bool receiveSuccessful = ballCommunicator.receiveRawBallData(errorMessage) == 0;
+    if (!receiveSuccessful)
+    {
+        emit dataReadError(QString(errorMessage.c_str()));
+        return;
+    }
+
+    /* グラフ用にセンサデータを記録する */
+    RawBallData receivedRawBallData = ballCommunicator.getRawBallData();
+    ProcessedBallData processedBallData = ballCommunicator.getProcessedBallData();
+    int currentBallID = 0;
+
+    // Check if the data is new
+    static int previousTimestamp = 0;
+    if (receivedRawBallData.t == previousTimestamp)
+        return;
+    previousTimestamp = receivedRawBallData.t;
+
+    /* センサグラフデータ追加 */
+    float tmpX, tmpY, tmpZ;
+    tmpX = receivedRawBallData.acceleration.x - sensorOffsetData[currentBallID].accelerationOffset.x;
+    tmpY = receivedRawBallData.acceleration.y - sensorOffsetData[currentBallID].accelerationOffset.y;
+    tmpZ = receivedRawBallData.acceleration.z - sensorOffsetData[currentBallID].accelerationOffset.z;
+    processedBallData.accelerationXYZ = sqrtf(tmpX * tmpX + tmpY * tmpY + tmpZ * tmpZ);
+    // Not sure if this makes sense
+    processedBallData.accelerationXYZNoG = processedBallData.accelerationXYZ - sensorOffsetData[currentBallID].gravityAccelerationOffset;
+
+    tmpX = receivedRawBallData.gyro.x - sensorOffsetData[currentBallID].gyroOffset.x;
+    tmpY = receivedRawBallData.gyro.y - sensorOffsetData[currentBallID].gyroOffset.y;
+    tmpZ = receivedRawBallData.gyro.z - sensorOffsetData[currentBallID].gyroOffset.z;
+    processedBallData.gyroXYZ = sqrtf(tmpX * tmpX + tmpY * tmpY + tmpZ * tmpZ);
+
+    // Store received data
+    RawBallData newRawData = receivedRawBallData;
+    newRawData.t = communicationTimer->systemTime - connectionStartedTime;
+    rawData.push_back(newRawData);
+    ProcessedBallData newProcessedBallData = processedBallData;
+    newProcessedBallData.t = communicationTimer->systemTime - connectionStartedTime;
+    processedData.push_back(newProcessedBallData);
+
+    // Send signal about receiving data
+    emit DataReceived(newProcessedBallData.t, newProcessedBallData.accelerationXYZNoG, newProcessedBallData.gyroXYZ);
 }
 
 BallCommunication::BallCommunication(QObject *parent) : QObject(parent)

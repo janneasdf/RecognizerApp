@@ -5,10 +5,11 @@
 Monitor::Monitor(QObject *parent) : QObject(parent)
 {
     ballCommunication = BallCommunication::getInstance();
-    QObject::connect(ballCommunication, SIGNAL(ConnectionOpened(QString)),
+    connect(ballCommunication, SIGNAL(ConnectionOpened(QString)),
                      this, SIGNAL(connectionStarted(QString)));
-    QObject::connect(ballCommunication, SIGNAL(ConnectionClosed(QString)),
+    connect(ballCommunication, SIGNAL(ConnectionClosed(QString)),
                      this, SIGNAL(connectionEnded(QString)));
+    connect(ballCommunication, SIGNAL(DataReceived(float,float,float)), this, SLOT(receiveData(float,float,float)));
 }
 
 void Monitor::tryStartConnection()
@@ -21,7 +22,7 @@ void Monitor::endConnection()
     ballCommunication->CloseConnection(true);
 }
 
-void Monitor::receiveData(const QString& data)
+void Monitor::receiveData(float timestamp, float acceleration, float gyro)
 {
-
+    emit dataReceived(timestamp, acceleration, gyro);
 }

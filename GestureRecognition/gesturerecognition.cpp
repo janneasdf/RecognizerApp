@@ -12,6 +12,7 @@ GestureRecognition::GestureRecognition(QObject* parent) : QObject(parent)
 
 void GestureRecognition::trainFromData(const QString& trainingFolder, const QStringList& filenames)
 {
+    // Convert Qt types to standard library types
     vector<string> filenames_std;
     for (const QString& filename : filenames)
     {

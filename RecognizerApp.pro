@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = RecognizerApp
 TEMPLATE = app
@@ -14,6 +14,19 @@ TEMPLATE = app
 CONFIG += qt debug
 
 INCLUDEPATH += BallCommunication/Libraries/
+
+# Tell the qcustomplot header that it will be used as library:
+DEFINES += QCUSTOMPLOT_USE_LIBRARY
+
+# Link with debug version of qcustomplot if compiling in debug mode, else with release library:
+CONFIG(debug, release|debug) {
+  win32:QCPLIB = qcustomplotd1
+  else: QCPLIB = qcustomplotd
+} else {
+  win32:QCPLIB = qcustomplot1
+  else: QCPLIB = qcustomplot
+}
+LIBS += "-L../RecognizerApp/Libraries/" -l$$QCPLIB
 
 contains(QT_ARCH, i386) {
     LIBS += "-LE:/Research/Sensorball/New stuff/RecognizerApp/BallCommunication/Libraries/SDL/x86/lib" -lSDL
@@ -151,7 +164,8 @@ SOURCES += main.cpp\
     GestureRecognition/Libraries/GRT/Util/TrainingLog.cpp \
     GestureRecognition/Libraries/GRT/Util/Util.cpp \
     GestureRecognition/Libraries/GRT/Util/WarningLog.cpp \
-    GestureRecognition/grthelper.cpp
+    GestureRecognition/grthelper.cpp \
+    recognitionview.cpp
 
 HEADERS  += mainwindow.h \
     BallCommunication/Libraries/SDL/include/begin_code.h \
@@ -369,11 +383,13 @@ HEADERS  += mainwindow.h \
     GestureRecognition/Libraries/GRT/Util/TrainingResult.h \
     GestureRecognition/Libraries/GRT/Util/util.h \
     GestureRecognition/Libraries/GRT/Util/WarningLog.h \
-    GestureRecognition/Libraries/GRT/GRT.h
+    GestureRecognition/Libraries/GRT/GRT.h \
+    recognitionview.h
 
 FORMS    += mainwindow.ui \
     monitorview.ui \
-    trainingview.ui
+    trainingview.ui \
+    recognitionview.ui
 
 SUBDIRS += \
     BallCommunication/BallCommunication.pro \

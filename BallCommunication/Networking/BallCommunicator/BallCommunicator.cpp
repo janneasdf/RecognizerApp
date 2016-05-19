@@ -42,7 +42,7 @@ void BallCommunicator::finalize(){
 } // finalize
 
 /* ëóêMèàóù */
-int BallCommunicator::receiveRawBallData(){ 
+int BallCommunicator::receiveRawBallData(string& errorMessage){
 
 	//unsigned int receivedSize;
 	//unsigned char tmpReceiveBuffer[16];		// payload + header/footer character + '\0'
@@ -68,7 +68,8 @@ int BallCommunicator::receiveRawBallData(){
 		//printf("retryCounter: %d", retryCounter);
 		if ( --retryCounter <= 0 ){
 			printf("Header Timeout\n");
-			return -1;
+            errorMessage = string("Couldn't receive data from rs232c: Header Timeout.");
+            return -1;
 		}
 	} while ( receivedSize != 1 || headerCharacter != 'B' );
 	
@@ -80,6 +81,7 @@ int BallCommunicator::receiveRawBallData(){
 		retryCounter--;
 		if ( retryCounter < 0 ){
 			printf("Payload Timeout\n");
+            errorMessage = string("Couldn't receive data from rs232c: Payload Timeout.");
 			return -1;
 		}
 	} while ( unreceivedSize > 0 );
@@ -97,62 +99,6 @@ int BallCommunicator::receiveRawBallData(){
 		receivedRawBallData.compass.y = ((int)(receiveBuffer[14] << 24 | receiveBuffer[15] << 16)) >> 16;
 		receivedRawBallData.compass.z = ((int)(receiveBuffer[16] << 24 | receiveBuffer[17] << 16)) >> 16;
 
-		//processedBallData.accelerationXYZ = sqrtf(receivedRawBallData.acceleration.x * receivedRawBallData.acceleration.x
-		//	+ receivedRawBallData.acceleration.y * receivedRawBallData.acceleration.y	+ receivedRawBallData.acceleration.z * receivedRawBallData.acceleration.z);
-		//processedBallData.compassXYZ = sqrtf(receivedRawBallData.compass.x * receivedRawBallData.compass.x
-		//	+ receivedRawBallData.compass.y * receivedRawBallData.compass.y	+ receivedRawBallData.compass.z * receivedRawBallData.compass.z);
-		//processedBallData.gyroXYZ = sqrtf(receivedRawBallData.gyro.x * receivedRawBallData.gyro.x
-		//	+ receivedRawBallData.gyro.y * receivedRawBallData.gyro.y	+ receivedRawBallData.gyro.z * receivedRawBallData.compass.z);
-
-		//receivedRawBallData.capacitiveData[0] = receiveBuffer[0] + (receiveBuffer[1] << 8);
-		//receivedRawBallData.capacitiveData[1] = receiveBuffer[2] + (receiveBuffer[3] << 8);
-		//receivedRawBallData.capacitiveData[2] = receiveBuffer[4] + (receiveBuffer[5] << 8);
-		//receivedRawBallData.capacitiveData[3] = receiveBuffer[6] + (receiveBuffer[7] << 8);
-
-		//receivedRawBallData.baselineData[0] = (unsigned int)receiveBuffer[8] * 4;
-		//receivedRawBallData.baselineData[1] = (unsigned int)receiveBuffer[9] * 4;
-		//receivedRawBallData.baselineData[2] = (unsigned int)receiveBuffer[10] * 4;
-		//receivedRawBallData.baselineData[3] = (unsigned int)receiveBuffer[11] * 4;
-
-		//receivedRawBallData.touchResult[0] = (unsigned int)receiveBuffer[18] & 0x01;
-		//receivedRawBallData.touchResult[1] = ((unsigned int)receiveBuffer[18] >> 1) & 0x01;
-		//receivedRawBallData.touchResult[2] = ((unsigned int)receiveBuffer[18] >> 2) & 0x01;
-		//receivedRawBallData.touchResult[3] = ((unsigned int)receiveBuffer[18] >> 3) & 0x01;
-		//receivedRawBallData.touchResult[4] = ((unsigned int)receiveBuffer[18] >> 4) & 0x01;
-		//receivedRawBallData.touchResult[5] = ((unsigned int)receiveBuffer[18] >> 5) & 0x01;
-		//receivedRawBallData.touchResult[6] = ((unsigned int)receiveBuffer[18] >> 6) & 0x01;
-		//receivedRawBallData.touchResult[7] = ((unsigned int)receiveBuffer[18] >> 7) & 0x01;
-		//receivedRawBallData.touchResult[8] = (unsigned int)receiveBuffer[19] & 0x01;
-		//receivedRawBallData.touchResult[9] = ((unsigned int)receiveBuffer[19] >> 1) & 0x01;
-		//receivedRawBallData.touchResult[10] = ((unsigned int)receiveBuffer[19] >> 2) & 0x01;
-		//receivedRawBallData.touchResult[11] = ((unsigned int)receiveBuffer[19] >> 3) & 0x01;
-
-		//receivedRawBallData.touchResult[12] = (unsigned int)receiveBuffer[20] & 0x01;
-		//receivedRawBallData.touchResult[13] = ((unsigned int)receiveBuffer[20] >> 1) & 0x01;
-		//receivedRawBallData.touchResult[14] = ((unsigned int)receiveBuffer[20] >> 2) & 0x01;
-		//receivedRawBallData.touchResult[15] = ((unsigned int)receiveBuffer[20] >> 3) & 0x01;
-		//receivedRawBallData.touchResult[16] = ((unsigned int)receiveBuffer[20] >> 4) & 0x01;
-		//receivedRawBallData.touchResult[17] = ((unsigned int)receiveBuffer[20] >> 5) & 0x01;
-		//receivedRawBallData.touchResult[18] = ((unsigned int)receiveBuffer[20] >> 6) & 0x01;
-		//receivedRawBallData.touchResult[19] = ((unsigned int)receiveBuffer[20] >> 7) & 0x01;
-		//receivedRawBallData.touchResult[20] = (unsigned int)receiveBuffer[21] & 0x01;
-		//receivedRawBallData.touchResult[21] = ((unsigned int)receiveBuffer[21] >> 1) & 0x01;
-		//receivedRawBallData.touchResult[22] = ((unsigned int)receiveBuffer[21] >> 2) & 0x01;
-		//receivedRawBallData.touchResult[23] = ((unsigned int)receiveBuffer[21] >> 3) & 0x01;
-
-		//receivedRawBallData.touchResult[24] = (unsigned int)receiveBuffer[22] & 0x01;
-		//receivedRawBallData.touchResult[25] = ((unsigned int)receiveBuffer[22] >> 1) & 0x01;
-		//receivedRawBallData.touchResult[26] = ((unsigned int)receiveBuffer[22] >> 2) & 0x01;
-		//receivedRawBallData.touchResult[27] = ((unsigned int)receiveBuffer[22] >> 3) & 0x01;
-		//receivedRawBallData.touchResult[28] = ((unsigned int)receiveBuffer[22] >> 4) & 0x01;
-		//receivedRawBallData.touchResult[29] = ((unsigned int)receiveBuffer[22] >> 5) & 0x01;
-		//receivedRawBallData.touchResult[30] = ((unsigned int)receiveBuffer[22] >> 6) & 0x01;
-		//receivedRawBallData.touchResult[31] = ((unsigned int)receiveBuffer[22] >> 7) & 0x01;
-		//receivedRawBallData.touchResult[32] = (unsigned int)receiveBuffer[23] & 0x01;
-		//receivedRawBallData.touchResult[33] = ((unsigned int)receiveBuffer[23] >> 1) & 0x01;
-		//receivedRawBallData.touchResult[34] = ((unsigned int)receiveBuffer[23] >> 2) & 0x01;
-		//receivedRawBallData.touchResult[35] = ((unsigned int)receiveBuffer[23] >> 3) & 0x01;
-
 		//printf("G:%04.01f %04.01f %04.01f\tA1:%04.01f %04.01f %04.01f\n",
 		//	receivedRawBallData.gyro.x, receivedRawBallData.gyro.y, receivedRawBallData.gyro.z,
 		//	receivedRawBallData.acceleration.x, receivedRawBallData.acceleration.y, receivedRawBallData.acceleration.z);
@@ -163,6 +109,7 @@ int BallCommunicator::receiveRawBallData(){
 
 		illegalPacketCounter++;
 		printf("Irregular Packet is Skipped\n");
+        errorMessage = string("Irregular Packet received: skipping");
 		return -1;
 	}
 

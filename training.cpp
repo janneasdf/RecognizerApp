@@ -19,7 +19,9 @@ Training::~Training()
 
 void Training::trainWithData(const QString& trainingFolder, const QStringList& trainingFilePaths)
 {
-    // todo
+    trainingWatcher->cancel();
+    trainingWatcher->waitForFinished();
+
     QtConcurrent::run(
                 [this](const QString& trainingFolder, const QStringList& trainingFilePaths) -> void
     {

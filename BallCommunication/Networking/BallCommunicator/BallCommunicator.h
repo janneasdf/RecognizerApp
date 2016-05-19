@@ -13,6 +13,7 @@
 using namespace std;
 
 #include "../../declaration.h"
+#include <string>
 
 #include "../RS232C/RS232c.h"
 #include "../Timer/Timer.h"
@@ -31,7 +32,7 @@ public:
 	virtual void finalize();
 
 	/* 送信処理 */
-	virtual int receiveRawBallData();
+    virtual int receiveRawBallData(string& errorMessage);
 
 	/* ボールデータの受け取り */
 	virtual RawBallData getRawBallData();

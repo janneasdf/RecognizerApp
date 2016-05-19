@@ -32,6 +32,8 @@ private:
     explicit BallCommunication(QObject* parent = 0);
     ~BallCommunication();
 
+    const int dataReadInterval = 60; // milliseconds
+
     bool connectionActive = false;
 
     //
@@ -65,12 +67,13 @@ private:
     const string gyroOffsetFilepathFormat = "./data/conf/gyroOffset%d.dat";
 
 signals:
-    void DataReceived();
     void ConnectionOpened(const QString& message);
     void ConnectionClosed(const QString& message);
+    void DataReceived(float timestamp, float acceleration, float gyro); // todo decide if parameters or not, also where is "all data" kept
+    void dataReadError(const QString& message);
 
 private slots:
-    void receiveData();
+    void readData();
 };
 
 #endif // BALLCOMMUNICATION_H

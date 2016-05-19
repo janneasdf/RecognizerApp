@@ -4,6 +4,7 @@
 #include "monitorview.h"
 #include "training.h"
 #include "trainingview.h"
+#include "recognitionview.h"
 #include <memory>
 
 using std::shared_ptr;
@@ -14,17 +15,20 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    Training* training = new Training(this);
+    TrainingView* trainingView = new TrainingView(this);
+    trainingView->initialize(training);
 
     Monitor* monitor = new Monitor(this);
     MonitorView* monitorView = new MonitorView(this);
     monitorView->initialize(monitor);
 
-    Training* training = new Training(this);
-    TrainingView* trainingView = new TrainingView(this);
-    trainingView->initialize(training);
+    RecognitionView* recognitionView = new RecognitionView(this);
+    recognitionView->initialize(monitor);
 
-    ui->monitorLayout->addWidget(monitorView);
     ui->trainingLayout->addWidget(trainingView);
+    ui->monitorLayout->addWidget(monitorView);
+    ui->recognitionLayout->addWidget(recognitionView);
 }
 
 MainWindow::~MainWindow()

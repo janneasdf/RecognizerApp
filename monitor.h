@@ -21,9 +21,10 @@ private:
 signals:
     void connectionStarted(const QString& connectionInfo);
     void connectionEnded(const QString& connectionEndedInfo);
+    void dataReceived(float timestamp, float acceleration, float gyro);
 
 private slots:
-    void receiveData(const QString& data); // todo not qstring but some packet thing
+    void receiveData(float timestamp, float acceleration, float gyro); // todo not qstring but some packet thing
 };
 
 #endif // MONITOR_H
