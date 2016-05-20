@@ -5,20 +5,32 @@
 #include "Libraries/SDL/include/SDL_net.h"
 #include "Networking/Network/Network.h"
 #include "Networking/BallCommunicator/BallCommunicator_UDP.h"
+#include <QtConcurrent/QtConcurrent>
 
 BallCommunication::BallCommunication(QObject *parent) : BallCommunicationBase(parent)
 {
+    dataReadingWatcher = new QFutureWatcher<void>(this);
 }
 
 BallCommunication::~BallCommunication()
 {
+    dataReadingWatcher->cancel();
+    dataReadingWatcher->waitForFinished();
     closeConnection(true);
 }
 
-void BallCommunication::readData()
+// Only reads data if previous read request is finished
+void BallCommunication::tryReadData()
 {
-    // Get newly received data, apply calibration, store it
-    processRawBallData();
+    if (dataReadingWatcher->isRunning())
+        return;
+
+    // Read data asynchronously to not make GUI lag
+    QtConcurrent::run([this]() -> void
+    {
+      // Get newly received data, apply calibration, store it
+      getNewData();
+    });
 }
 
 void BallCommunication::openConnection()
@@ -90,7 +102,7 @@ void BallCommunication::openConnection()
         }
     }
 
-    QObject::connect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(readData()));
+    QObject::connect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(tryReadData()));
     dataReadTimer.start(dataReadInterval);
 
     connectionStartedTime = QDateTime::currentMSecsSinceEpoch();
@@ -102,10 +114,6 @@ void BallCommunication::openConnection()
 
 void BallCommunication::closeConnection(bool clearData)
 {
-//    for (int i = 0; i < MAX_ELECTRODES; i++) {
-//        touchedSE[i].releaseSE();
-//    }
-
     if (!flagNetworkFromUDP){
         ballCommunicator.finalize();
     }else{
@@ -117,7 +125,7 @@ void BallCommunication::closeConnection(bool clearData)
     SDLNet_Quit();
     SDL_Quit();
 
-    QObject::disconnect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(readData()));
+    QObject::disconnect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(tryReadData()));
     dataReadTimer.stop();
 
     if (clearData)
@@ -133,7 +141,7 @@ void BallCommunication::closeConnection(bool clearData)
 }
 
 /* ボールデータの処理 */
-void BallCommunication::processRawBallData() {
+void BallCommunication::getNewData() {
     // Ask ballcommunicator to read the new data from the ball's sensors
     string errorMessage;
     bool receiveSuccessful = ballCommunicator.receiveRawBallData(errorMessage) == 1;

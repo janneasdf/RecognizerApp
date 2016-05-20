@@ -5,12 +5,13 @@
 #include "Utilities/AccelerometerCalibrator/AccelerometerCalibrator.h"
 #include "Utilities/GyroCalibrator/GyroCalibrator.h"
 #include <iostream>
-#include <qtimer.h>
+#include <QTimer>
+#include <QObject>
+#include <QDateTime>
+#include <QFutureWatcher>
 #include <vector>
 #include <string>
-#include <qobject.h>
 #include "ballcommunicationbase.h"
-#include <qdatetime.h>
 
 using std::vector;
 using std::string;
@@ -28,7 +29,9 @@ public:
 private:
     const int dataReadInterval = 1000.0 / 10.0; // milliseconds
 
-    void processRawBallData();
+    void getNewData();
+
+    QFutureWatcher<void>* dataReadingWatcher;
 
     // Communicator for communicating with ball and receiving data
     BallCommunicator ballCommunicator;
@@ -52,7 +55,7 @@ private:
     const string gyroOffsetFilepathFormat = "./data/conf/gyroOffset%d.dat";
 
 private slots:
-    void readData();
+    void tryReadData();
 };
 
 #endif // BALLCOMMUNICATION_H
