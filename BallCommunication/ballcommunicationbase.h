@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <qobject.h>
+#include <qdatetime.h>
 
 using std::vector;
 using std::string;
@@ -21,10 +22,12 @@ public:
     virtual void openConnection() = 0;
     virtual void closeConnection(bool clearData) = 0;
     bool isConnectionActive() { return connectionActive; }
+    qint64 getConnectionStartedTime() { return connectionStartedTime; }
 
 protected:
     explicit BallCommunicationBase(QObject *parent = 0);
     bool connectionActive = false;
+    qint64 connectionStartedTime = 0;
 
 signals:
     void connectionOpened(const QString& message);

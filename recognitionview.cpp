@@ -8,9 +8,9 @@ RecognitionView::RecognitionView(QWidget *parent) :
     ui->setupUi(this);
 }
 
-void RecognitionView::initialize(Monitor *monitor)
+void RecognitionView::initialize(BallCommunicationBase* ballCommunication)
 {
-    this->monitor = monitor;
+    this->ballCommunication = ballCommunication;
 
     // Create plot that shows sensor values in real time
     sensorPlot = new QCustomPlot();
@@ -35,9 +35,9 @@ void RecognitionView::initialize(Monitor *monitor)
     connect(sensorPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), sensorPlot->yAxis2, SLOT(setRange(QCPRange)));
 
     // Update plot when there's new data (todo: maybe not one per signal emission?)
-    connect(monitor, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
+    connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
     // Clear graph when closing connection
-    connect(monitor, SIGNAL(connectionEnded(QString)), this, SLOT(clearGraph()));
+    connect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
 
     QTimer* lagInfoUpdateTimer = new QTimer();
     connect(lagInfoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateLagInfo()));
@@ -77,7 +77,7 @@ void RecognitionView::clearGraph()
 
 void RecognitionView::updateLagInfo()
 {
-    qint64 lag = QDateTime::currentMSecsSinceEpoch() - previousUpdateTimestamp;
+    qint64 lag = (QDateTime::currentMSecsSinceEpoch() - ballCommunication->getConnectionStartedTime()) - previousUpdateTimestamp;
     QString lagText = QString("Current lag: ") + QString::number(lag) + QString(" milliseconds. ");
     ui->currentLagLabel->setText(lagText);
 }

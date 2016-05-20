@@ -50,7 +50,6 @@ SOURCES += main.cpp\
     BallCommunication/ballcommunication.cpp \
     GestureRecognition/gesturerecognition.cpp \
     mainlogic.cpp \
-    monitor.cpp \
     monitorview.cpp \
     training.cpp \
     trainingview.cpp \
@@ -230,7 +229,6 @@ HEADERS  += mainwindow.h \
     BallCommunication/declaration.h \
     GestureRecognition/gesturerecognition.h \
     mainlogic.h \
-    monitor.h \
     monitorview.h \
     training.h \
     trainingview.h \

@@ -9,17 +9,17 @@ MonitorView::MonitorView(QWidget *parent) : QWidget(parent), ui(new Ui::MonitorV
     ui->setupUi(this);
 }
 
-void MonitorView::initialize(Monitor* monitor)
+void MonitorView::initialize(BallCommunicationBase* ballCommunication)
 {
-    this->monitor = monitor;
+    this->ballCommunication = ballCommunication;
 
     connect(ui->clearButton, SIGNAL(clicked(bool)), this, SLOT(clearButtonPressed()));
     connect(ui->toggleConnectionButton, SIGNAL(clicked(bool)), this, SLOT(toggleConnectionButtonPressed()));
 
-    connect(monitor, SIGNAL(connectionStarted(QString)), this, SLOT(onConnectionStarted(QString)));
-    connect(monitor, SIGNAL(connectionEnded(QString)), this, SLOT(onConnectionEnded(QString)));
-    connect(monitor, SIGNAL(dataError(QString)), this, SLOT(onMessage(QString)));
-    connect(monitor, SIGNAL(dataReceived(float,float,float)), this, SLOT(onDataReceived(float,float,float)));
+    connect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(onConnectionStarted(QString)));
+    connect(ballCommunication, SIGNAL(connectionClosed(QString)), this, SLOT(onConnectionEnded(QString)));
+    connect(ballCommunication, SIGNAL(dataReadError(QString)), this, SLOT(onMessage(QString)));
+    connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(onDataReceived(float,float,float)));
 }
 void MonitorView::onConnectionStarted(const QString& message)
 {
@@ -51,14 +51,15 @@ void MonitorView::clearButtonPressed()
 
 void MonitorView::toggleConnectionButtonPressed()
 {
-    if (monitor->isConnectionActive())
+    if (ballCommunication->isConnectionActive())
     {
-        monitor->endConnection();
+        ballCommunication->closeConnection(true);
     }
     else
     {
-        try {
-            monitor->tryStartConnection();
+        try
+        {
+            ballCommunication->openConnection();
         }
         catch (std::exception e)
         {

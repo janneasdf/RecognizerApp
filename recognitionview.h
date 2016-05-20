@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "Libraries/qcustomplot.h"
-#include "monitor.h"
+#include "BallCommunication/ballcommunicationbase.h"
 #include <qdatetime.h>
 
 namespace Ui {
@@ -18,10 +18,10 @@ public:
     explicit RecognitionView(QWidget *parent = 0);
     ~RecognitionView();
 
-    void initialize(Monitor* monitor);
+    void initialize(BallCommunicationBase* ballCommunication);
 
 private:
-    Monitor* monitor;
+    BallCommunicationBase* ballCommunication;
     QCustomPlot* sensorPlot;
     const int accelGraphIndex = 0;
     const int gyroGraphIndex = 1;

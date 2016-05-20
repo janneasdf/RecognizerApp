@@ -1,7 +1,7 @@
 #ifndef MONITORVIEW_H
 #define MONITORVIEW_H
 
-#include "monitor.h"
+#include "BallCommunication/ballcommunicationbase.h"
 #include "ui_monitorview.h"
 #include <QObject>
 #include <qtextbrowser.h>
@@ -15,10 +15,10 @@ class MonitorView : public QWidget
     Q_OBJECT
 public:
     explicit MonitorView(QWidget* parent = 0);
-    void initialize(Monitor* monitor);
+    void initialize(BallCommunicationBase* ballCommunication);
 
 private:
-    Monitor* monitor;
+    BallCommunicationBase* ballCommunication;
     Ui::MonitorView* ui;
 signals:
 

@@ -20,7 +20,7 @@ void BallCommunicationFake::openConnection()
     emit connectionOpened(QString("Opened fake connection"));
     connect(&updateTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
     updateTimer.start(60);
-    startTime = QDateTime::currentMSecsSinceEpoch();
+    connectionStartedTime = QDateTime::currentMSecsSinceEpoch();
     connectionActive = true;
 }
 
@@ -39,6 +39,6 @@ void BallCommunicationFake::closeConnection(bool clearData)
 
 void BallCommunicationFake::receiveData()
 {
-    qint64 msecsFromStart = QDateTime::currentMSecsSinceEpoch() - startTime;
+    qint64 msecsFromStart = QDateTime::currentMSecsSinceEpoch() - connectionStartedTime;
     emit dataReceived(msecsFromStart, 10 * sin(msecsFromStart * 0.001), 10 * cos(msecsFromStart * 0.001));
 }

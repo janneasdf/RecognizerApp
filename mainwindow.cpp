@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "monitor.h"
 #include "monitorview.h"
 #include "training.h"
 #include "trainingview.h"
@@ -8,9 +7,11 @@
 #include "BallCommunication/ballcommunication.h"
 #include "BallCommunication/ballcommunicationfake.h"
 #include <memory>
+#include <stdio.h>
 
 using std::shared_ptr;
 
+// Define this as 1 if you don't have the ball ready
 #define FAKE_COMMUNICATION 0
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+//    fclose(stdout);
+//    std::cout.setstate(std::ios_base::failbit); // turn off cout
 
     Training* training = new Training(this);
     TrainingView* trainingView = new TrainingView(this);
@@ -28,14 +32,12 @@ MainWindow::MainWindow(QWidget *parent) :
 #else
     BallCommunicationBase* ballCommunication = new BallCommunication(this);
 #endif
-    Monitor* monitor = new Monitor(this);
-    monitor->initialize(ballCommunication);
 
     MonitorView* monitorView = new MonitorView(this);
-    monitorView->initialize(monitor);
+    monitorView->initialize(ballCommunication);
 
     RecognitionView* recognitionView = new RecognitionView(this);
-    recognitionView->initialize(monitor);
+    recognitionView->initialize(ballCommunication);
 
     ui->trainingLayout->addWidget(trainingView);
     ui->monitorLayout->addWidget(monitorView);

@@ -57,7 +57,8 @@ int BallCommunicator::receiveRawBallData(string& errorMessage){
 	unsigned char receiveBuffer[128];			// 十分なサイズ
 	char headerCharacter;
 	int unreceivedSize = PACKET_SIZE_WITHOUT_HEADER;
-	int retryCounter = 100000;
+//	int retryCounter = 100000;
+    int retryCounter = 100;
 	int receivedSize = 0;
 	
 	/* 1文字ずつ受信し、頭文字'B'を探す */

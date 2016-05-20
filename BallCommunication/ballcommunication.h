@@ -40,9 +40,6 @@ private:
     // Timer for deciding when to read received data
     QTimer dataReadTimer;
 
-    // Time when connection was started
-    qint64 connectionStartedTime;
-
     int flagNetworkFromUDP = 0;
     static const int MAX_BALLS = 1;
     SensorOffsetData sensorOffsetData[MAX_BALLS];
