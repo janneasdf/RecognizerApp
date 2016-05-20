@@ -29,6 +29,8 @@ private slots:
     void toggleConnectionButtonPressed();
     void onConnectionStarted(const QString& message);
     void onConnectionEnded(const QString& message);
+    void onMessage(const QString& message);
+    void onDataReceived(float timestamp, float acceleration, float gyro);
 };
 
 #endif // MONITORVIEW_H

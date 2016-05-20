@@ -15,6 +15,7 @@ void Monitor::initialize(BallCommunicationBase *ballCommunication)
     connect(ballCommunication, SIGNAL(connectionClosed(QString)),
                      this, SIGNAL(connectionEnded(QString)));
     connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(receiveData(float,float,float)));
+    connect(ballCommunication, SIGNAL(dataReadError(QString)), this, SIGNAL(dataError(QString)));
 }
 
 void Monitor::tryStartConnection()

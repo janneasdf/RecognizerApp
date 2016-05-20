@@ -1,7 +1,6 @@
 #include "BallCommunicator_UDP.h"
 
 BallCommunicatorUDP::BallCommunicatorUDP(){
-	timer = Timer::getInstance();
 	receivedRawBallData.ballID = -1;
 }
 

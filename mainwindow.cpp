@@ -11,7 +11,7 @@
 
 using std::shared_ptr;
 
-#define FAKE_COMMUNICATION 1
+#define FAKE_COMMUNICATION 0
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

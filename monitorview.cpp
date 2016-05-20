@@ -12,10 +12,14 @@ MonitorView::MonitorView(QWidget *parent) : QWidget(parent), ui(new Ui::MonitorV
 void MonitorView::initialize(Monitor* monitor)
 {
     this->monitor = monitor;
+
     connect(ui->clearButton, SIGNAL(clicked(bool)), this, SLOT(clearButtonPressed()));
+    connect(ui->toggleConnectionButton, SIGNAL(clicked(bool)), this, SLOT(toggleConnectionButtonPressed()));
+
     connect(monitor, SIGNAL(connectionStarted(QString)), this, SLOT(onConnectionStarted(QString)));
     connect(monitor, SIGNAL(connectionEnded(QString)), this, SLOT(onConnectionEnded(QString)));
-    connect(ui->toggleConnectionButton, SIGNAL(clicked(bool)), this, SLOT(toggleConnectionButtonPressed()));
+    connect(monitor, SIGNAL(dataError(QString)), this, SLOT(onMessage(QString)));
+    connect(monitor, SIGNAL(dataReceived(float,float,float)), this, SLOT(onDataReceived(float,float,float)));
 }
 void MonitorView::onConnectionStarted(const QString& message)
 {
@@ -27,6 +31,17 @@ void MonitorView::onConnectionEnded(const QString& message)
 {
     ui->logBrowser->append(message);
     ui->toggleConnectionButton->setText("Open connection");
+}
+
+void MonitorView::onMessage(const QString &message)
+{
+    ui->logBrowser->append(message);
+}
+
+void MonitorView::onDataReceived(float timestamp, float acceleration, float gyro)
+{
+    (void)timestamp;
+    ui->logBrowser->append(QString("Received data: ") + QString::number(acceleration) + QString::number(gyro));
 }
 
 void MonitorView::clearButtonPressed()

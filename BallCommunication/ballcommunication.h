@@ -10,6 +10,7 @@
 #include <string>
 #include <qobject.h>
 #include "ballcommunicationbase.h"
+#include <qdatetime.h>
 
 using std::vector;
 using std::string;
@@ -25,7 +26,7 @@ public:
     void closeConnection(bool clearData) override;
 
 private:
-    const int dataReadInterval = 60; // milliseconds
+    const int dataReadInterval = 1000.0 / 10.0; // milliseconds
 
     void processRawBallData();
 
@@ -39,11 +40,8 @@ private:
     // Timer for deciding when to read received data
     QTimer dataReadTimer;
 
-    // Ball communication related timer
-    const Timer* communicationTimer;
-
     // Time when connection was started
-    Uint32 connectionStartedTime;
+    qint64 connectionStartedTime;
 
     int flagNetworkFromUDP = 0;
     static const int MAX_BALLS = 1;

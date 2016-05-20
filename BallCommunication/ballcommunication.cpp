@@ -8,7 +8,6 @@
 
 BallCommunication::BallCommunication(QObject *parent) : BallCommunicationBase(parent)
 {
-    communicationTimer = Timer::getInstance();
 }
 
 BallCommunication::~BallCommunication()
@@ -94,6 +93,7 @@ void BallCommunication::openConnection()
     QObject::connect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(readData()));
     dataReadTimer.start(dataReadInterval);
 
+    connectionStartedTime = QDateTime::currentMSecsSinceEpoch();
     connectionActive = true;
 
     // Emit signal about opened connection
@@ -136,7 +136,7 @@ void BallCommunication::closeConnection(bool clearData)
 void BallCommunication::processRawBallData() {
     // Ask ballcommunicator to read the new data from the ball's sensors
     string errorMessage;
-    bool receiveSuccessful = ballCommunicator.receiveRawBallData(errorMessage) == 0;
+    bool receiveSuccessful = ballCommunicator.receiveRawBallData(errorMessage) == 1;
     if (!receiveSuccessful)
     {
         emit dataReadError(QString(errorMessage.c_str()));
@@ -147,12 +147,6 @@ void BallCommunication::processRawBallData() {
     RawBallData receivedRawBallData = ballCommunicator.getRawBallData();
     ProcessedBallData processedBallData = ballCommunicator.getProcessedBallData();
     int currentBallID = 0;
-
-    // Check if the data is new
-    static int previousTimestamp = 0;
-    if (receivedRawBallData.t == previousTimestamp)
-        return;
-    previousTimestamp = receivedRawBallData.t;
 
     /* センサグラフデータ追加 */
     float tmpX, tmpY, tmpZ;
@@ -170,10 +164,10 @@ void BallCommunication::processRawBallData() {
 
     // Store received data
     RawBallData newRawData = receivedRawBallData;
-    newRawData.t = communicationTimer->systemTime - connectionStartedTime;
+    newRawData.t = QDateTime::currentMSecsSinceEpoch() - connectionStartedTime;
     rawData.push_back(newRawData);
     ProcessedBallData newProcessedBallData = processedBallData;
-    newProcessedBallData.t = communicationTimer->systemTime - connectionStartedTime;
+    newProcessedBallData.t = QDateTime::currentMSecsSinceEpoch() - connectionStartedTime;
     processedData.push_back(newProcessedBallData);
 
     // Send signal about receiving data

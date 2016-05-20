@@ -17,11 +17,11 @@ void RecognitionView::initialize(Monitor *monitor)
     ui->verticalLayout->addWidget(sensorPlot);
     sensorPlot->addGraph(); // Accelerometer graph (acceleration)
     sensorPlot->graph(accelGraphIndex)->setPen(QPen(Qt::blue));
-    sensorPlot->graph(accelGraphIndex)->setBrush(QBrush(QColor(240, 255, 200)));
+//    sensorPlot->graph(accelGraphIndex)->setBrush(QBrush(QColor(240, 255, 200)));
     sensorPlot->graph(accelGraphIndex)->setAntialiasedFill(false);
     sensorPlot->addGraph(); // Gyroscope graph (angular velocity)
     sensorPlot->graph(gyroGraphIndex)->setPen(QPen(Qt::red));
-    sensorPlot->graph(gyroGraphIndex)->setBrush(QBrush(QColor(240, 255, 200)));
+//    sensorPlot->graph(gyroGraphIndex)->setBrush(QBrush(QColor(240, 255, 200)));
     sensorPlot->graph(gyroGraphIndex)->setAntialiasedFill(false);
 
     // Setup axes
@@ -36,14 +36,19 @@ void RecognitionView::initialize(Monitor *monitor)
 
     // Update plot when there's new data (todo: maybe not one per signal emission?)
     connect(monitor, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
+    // Clear graph when closing connection
+    connect(monitor, SIGNAL(connectionEnded(QString)), this, SLOT(clearGraph()));
+
+    QTimer* lagInfoUpdateTimer = new QTimer();
+    connect(lagInfoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateLagInfo()));
+    lagInfoUpdateTimer->start(1000);
 }
 
 void RecognitionView::updateGraph(float timestamp, float acceleration, float gyro)
 {
     // calculate two new data points:
     double time = 0.001 * timestamp;
-    static double lastPointKey = 0;
-    if (time-lastPointKey > 0.01) // at most add point every 10 ms
+    if (time - previousUpdateTimestamp * 0.001 > 0.1)
     {
       double value0 = acceleration;
       double value1 = gyro;
@@ -56,11 +61,25 @@ void RecognitionView::updateGraph(float timestamp, float acceleration, float gyr
       // rescale value (vertical) axis to fit the current data:
       sensorPlot->graph(0)->rescaleValueAxis();
       sensorPlot->graph(1)->rescaleValueAxis(true);
-      lastPointKey = time;
+      previousUpdateTimestamp = timestamp;
     }
     // make key axis range scroll with the data (at a constant range size of 8):
     sensorPlot->xAxis->setRange(time+0.25, 8, Qt::AlignRight);
     sensorPlot->replot();
+}
+
+void RecognitionView::clearGraph()
+{
+    sensorPlot->graph(0)->clearData();
+    sensorPlot->graph(1)->clearData();
+    previousUpdateTimestamp = 0;
+}
+
+void RecognitionView::updateLagInfo()
+{
+    qint64 lag = QDateTime::currentMSecsSinceEpoch() - previousUpdateTimestamp;
+    QString lagText = QString("Current lag: ") + QString::number(lag) + QString(" milliseconds. ");
+    ui->currentLagLabel->setText(lagText);
 }
 
 RecognitionView::~RecognitionView()

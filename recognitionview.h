@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "Libraries/qcustomplot.h"
 #include "monitor.h"
+#include <qdatetime.h>
 
 namespace Ui {
 class RecognitionView;
@@ -24,10 +25,14 @@ private:
     QCustomPlot* sensorPlot;
     const int accelGraphIndex = 0;
     const int gyroGraphIndex = 1;
+    float previousUpdateTimestamp = 0;
+
     Ui::RecognitionView *ui;
 
 private slots:
     void updateGraph(float timestamp, float acceleration, float gyro);
+    void clearGraph();
+    void updateLagInfo();
 };
 
 #endif // RECOGNITIONVIEW_H

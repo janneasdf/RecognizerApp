@@ -51,7 +51,6 @@ public:
 
 protected:
 
-	Timer *timer;
 	RS232c *rs232c;
 
 	RawBallData receivedRawBallData;

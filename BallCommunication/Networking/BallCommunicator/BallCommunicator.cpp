@@ -1,7 +1,6 @@
 #include "BallCommunicator.h"
 
 BallCommunicator::BallCommunicator(){
-	timer = Timer::getInstance();
 	receivedRawBallData.ballID = -1;
 }
 
@@ -109,11 +108,12 @@ int BallCommunicator::receiveRawBallData(string& errorMessage){
 
 		illegalPacketCounter++;
 		printf("Irregular Packet is Skipped\n");
-        errorMessage = string("Irregular Packet received: skipping");
+        errorMessage = string("Irregular Packet received: skipping. ");
 		return -1;
 	}
 
 	//printf("ê⁄ë±Ç≥ÇÍÇƒÇ¢Ç‹ÇπÇÒÅB\n");
+    errorMessage = string("No data to receive. ");
 	return 0;
 } // receiveRawBallData
 

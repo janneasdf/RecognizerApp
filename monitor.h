@@ -24,6 +24,7 @@ signals:
     void connectionStarted(const QString& connectionInfo);
     void connectionEnded(const QString& connectionEndedInfo);
     void dataReceived(float timestamp, float acceleration, float gyro);
+    void dataError(const QString& errorMessage);
 
 private slots:
     void receiveData(float timestamp, float acceleration, float gyro); // todo not qstring but some packet thing
