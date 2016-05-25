@@ -15,7 +15,6 @@ public:
 
 private:
     QTimer updateTimer;
-    qint64 startTime;
 
 private slots:
     void receiveData();

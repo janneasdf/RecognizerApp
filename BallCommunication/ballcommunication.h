@@ -16,12 +16,12 @@
 using std::vector;
 using std::string;
 
-class BallCommunication : public BallCommunicationBase
+class BallCommunicationReal : public BallCommunicationBase
 {
     Q_OBJECT
 public:
-    explicit BallCommunication(QObject* parent = 0);
-    ~BallCommunication();
+    explicit BallCommunicationReal(QObject* parent = 0);
+    ~BallCommunicationReal();
 
     void openConnection() override;
     void closeConnection(bool clearData) override;

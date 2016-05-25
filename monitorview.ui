@@ -71,7 +71,16 @@
        <item>
         <widget class="QPushButton" name="toggleConnectionButton">
          <property name="text">
-          <string>Open Connection</string>
+          <string>Open Connection
+(real-time)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="fileConnectionButton">
+         <property name="text">
+          <string>Open Connection
+(from file)</string>
          </property>
         </widget>
        </item>

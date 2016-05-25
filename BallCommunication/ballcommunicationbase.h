@@ -23,11 +23,13 @@ public:
     virtual void closeConnection(bool clearData) = 0;
     bool isConnectionActive() { return connectionActive; }
     qint64 getConnectionStartedTime() { return connectionStartedTime; }
+    string getName() { return name; }
 
 protected:
     explicit BallCommunicationBase(QObject *parent = 0);
     bool connectionActive = false;
     qint64 connectionStartedTime = 0;
+    string name = "Unintialized name";  // Set in deriving classes
 
 signals:
     void connectionOpened(const QString& message);

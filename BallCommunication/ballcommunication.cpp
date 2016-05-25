@@ -7,12 +7,12 @@
 #include "Networking/BallCommunicator/BallCommunicator_UDP.h"
 #include <QtConcurrent/QtConcurrent>
 
-BallCommunication::BallCommunication(QObject *parent) : BallCommunicationBase(parent)
+BallCommunicationReal::BallCommunicationReal(QObject *parent) : BallCommunicationBase(parent)
 {
     dataReadingWatcher = new QFutureWatcher<void>(this);
 }
 
-BallCommunication::~BallCommunication()
+BallCommunicationReal::~BallCommunicationReal()
 {
     dataReadingWatcher->cancel();
     dataReadingWatcher->waitForFinished();
@@ -20,7 +20,7 @@ BallCommunication::~BallCommunication()
 }
 
 // Only reads data if previous read request is finished
-void BallCommunication::tryReadData()
+void BallCommunicationReal::tryReadData()
 {
     if (dataReadingWatcher->isRunning())
         return;
@@ -33,7 +33,7 @@ void BallCommunication::tryReadData()
     });
 }
 
-void BallCommunication::openConnection()
+void BallCommunicationReal::openConnection()
 {
     /* Initialize SDL_net */
     if ( SDLNet_Init() < 0 ){
@@ -112,7 +112,7 @@ void BallCommunication::openConnection()
     emit connectionOpened(QString("Opened connection"));
 }
 
-void BallCommunication::closeConnection(bool clearData)
+void BallCommunicationReal::closeConnection(bool clearData)
 {
     if (!flagNetworkFromUDP){
         ballCommunicator.finalize();
@@ -141,7 +141,7 @@ void BallCommunication::closeConnection(bool clearData)
 }
 
 /* ボールデータの処理 */
-void BallCommunication::getNewData() {
+void BallCommunicationReal::getNewData() {
     // Ask ballcommunicator to read the new data from the ball's sensors
     string errorMessage;
     bool receiveSuccessful = ballCommunicator.receiveRawBallData(errorMessage) == 1;

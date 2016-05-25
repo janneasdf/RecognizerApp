@@ -6,13 +6,14 @@
 #include "recognitionview.h"
 #include "BallCommunication/ballcommunication.h"
 #include "BallCommunication/ballcommunicationfake.h"
+#include "BallCommunication/databallcommunication.h"
 #include <memory>
 #include <stdio.h>
 
 using std::shared_ptr;
 
 // Define this as 1 if you don't have the ball ready
-#define FAKE_COMMUNICATION 0
+#define FAKE_COMMUNICATION 1
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,12 +33,14 @@ MainWindow::MainWindow(QWidget *parent) :
 #else
     BallCommunicationBase* ballCommunication = new BallCommunication(this);
 #endif
+    DataBallCommunication* dataBallCommunication = new DataBallCommunication(this);
 
     MonitorView* monitorView = new MonitorView(this);
-    monitorView->initialize(ballCommunication);
+    monitorView->initialize(ballCommunication, dataBallCommunication);
 
     RecognitionView* recognitionView = new RecognitionView(this);
-    recognitionView->initialize(ballCommunication);
+    recognitionView->initialize();
+    recognitionView->setDataSource(ballCommunication);
 
     ui->trainingLayout->addWidget(trainingView);
     ui->monitorLayout->addWidget(monitorView);
@@ -47,4 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::signalSourceChanged(BallCommunicationBase *newSource)
+{
+
 }

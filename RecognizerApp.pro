@@ -166,7 +166,8 @@ SOURCES += main.cpp\
     GestureRecognition/grthelper.cpp \
     recognitionview.cpp \
     BallCommunication/ballcommunicationbase.cpp \
-    BallCommunication/ballcommunicationfake.cpp
+    BallCommunication/ballcommunicationfake.cpp \
+    BallCommunication/databallcommunication.cpp
 
 HEADERS  += mainwindow.h \
     BallCommunication/Libraries/SDL/include/begin_code.h \
@@ -386,7 +387,9 @@ HEADERS  += mainwindow.h \
     GestureRecognition/Libraries/GRT/GRT.h \
     recognitionview.h \
     BallCommunication/ballcommunicationbase.h \
-    BallCommunication/ballcommunicationfake.h
+    BallCommunication/ballcommunicationfake.h \
+    BallCommunication/databallcommunication.h \
+    BallCommunication/sensordataframe.h
 
 FORMS    += mainwindow.ui \
     monitorview.ui \

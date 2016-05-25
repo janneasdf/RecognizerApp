@@ -18,7 +18,8 @@ public:
     explicit RecognitionView(QWidget *parent = 0);
     ~RecognitionView();
 
-    void initialize(BallCommunicationBase* ballCommunication);
+    void initialize();
+    void setDataSource(BallCommunicationBase* ballCommunication);
 
 private:
     BallCommunicationBase* ballCommunication;

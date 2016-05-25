@@ -8,10 +8,8 @@ RecognitionView::RecognitionView(QWidget *parent) :
     ui->setupUi(this);
 }
 
-void RecognitionView::initialize(BallCommunicationBase* ballCommunication)
+void RecognitionView::initialize()
 {
-    this->ballCommunication = ballCommunication;
-
     // Create plot that shows sensor values in real time
     sensorPlot = new QCustomPlot();
     ui->verticalLayout->addWidget(sensorPlot);
@@ -30,18 +28,32 @@ void RecognitionView::initialize(BallCommunicationBase* ballCommunication)
     sensorPlot->xAxis->setTickStep(2);
     sensorPlot->axisRect()->setupFullAxesBox();
 
-    // make left and bottom axes transfer their ranges to right and top axes:
+    // Make left and bottom axes transfer their ranges to right and top axes:
     connect(sensorPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), sensorPlot->xAxis2, SLOT(setRange(QCPRange)));
     connect(sensorPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), sensorPlot->yAxis2, SLOT(setRange(QCPRange)));
+
+    // Setup lag info updating (showing latency for receiving data)
+    QTimer* lagInfoUpdateTimer = new QTimer();
+    connect(lagInfoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateLagInfo()));
+    lagInfoUpdateTimer->start(1000);
+}
+
+void RecognitionView::setDataSource(BallCommunicationBase *ballCommunication)
+{
+    if (this->ballCommunication)
+    {
+        // Disconnect from earlier source
+        disconnect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
+        // Clear graph when closing connection
+        disconnect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
+    }
+
+    this->ballCommunication = ballCommunication;
 
     // Update plot when there's new data (todo: maybe not one per signal emission?)
     connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
     // Clear graph when closing connection
     connect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
-
-    QTimer* lagInfoUpdateTimer = new QTimer();
-    connect(lagInfoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateLagInfo()));
-    lagInfoUpdateTimer->start(1000);
 }
 
 void RecognitionView::updateGraph(float timestamp, float acceleration, float gyro)

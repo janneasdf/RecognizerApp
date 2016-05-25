@@ -13,10 +13,8 @@ BallCommunicationFake::~BallCommunicationFake()
 
 void BallCommunicationFake::openConnection()
 {
-    if (connectionActive)
-    {
-        return;
-    }
+    if (connectionActive) return;
+
     emit connectionOpened(QString("Opened fake connection"));
     connect(&updateTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
     updateTimer.start(60);
@@ -26,10 +24,8 @@ void BallCommunicationFake::openConnection()
 
 void BallCommunicationFake::closeConnection(bool clearData)
 {
-    if (!connectionActive)
-    {
-        return;
-    }
+    if (!connectionActive) return;
+
     (void*)clearData;
     emit connectionClosed(QString("Closed fake connection"));
     disconnect(&updateTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
