@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "BallCommunication/ballcommunicationbase.h"
 
 namespace Ui {
 class MainWindow;

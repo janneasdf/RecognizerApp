@@ -45,14 +45,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->trainingLayout->addWidget(trainingView);
     ui->monitorLayout->addWidget(monitorView);
     ui->recognitionLayout->addWidget(recognitionView);
+
+    connect(monitorView, SIGNAL(signalSourceChanged(BallCommunicationBase*)), recognitionView, SLOT(onSignalSourceChanged(BallCommunicationBase*)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::signalSourceChanged(BallCommunicationBase *newSource)
-{
-
 }

@@ -44,7 +44,7 @@ void RecognitionView::setDataSource(BallCommunicationBase *ballCommunication)
     {
         // Disconnect from earlier source
         disconnect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
-        // Clear graph when closing connection
+        // Clear graph when re-opening connection
         disconnect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
     }
 
@@ -52,8 +52,14 @@ void RecognitionView::setDataSource(BallCommunicationBase *ballCommunication)
 
     // Update plot when there's new data (todo: maybe not one per signal emission?)
     connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
-    // Clear graph when closing connection
+    // Clear graph when re-opening connection
     connect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
+    clearGraph();
+}
+
+void RecognitionView::onSignalSourceChanged(BallCommunicationBase *newSource)
+{
+    setDataSource(newSource);
 }
 
 void RecognitionView::updateGraph(float timestamp, float acceleration, float gyro)

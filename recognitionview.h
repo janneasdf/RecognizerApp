@@ -30,6 +30,9 @@ private:
 
     Ui::RecognitionView *ui;
 
+public slots:
+    void onSignalSourceChanged(BallCommunicationBase* newSource);
+
 private slots:
     void updateGraph(float timestamp, float acceleration, float gyro);
     void clearGraph();

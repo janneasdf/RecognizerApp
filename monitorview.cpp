@@ -74,6 +74,7 @@ void MonitorView::onConnectionStarted(const QString& message)
 {
     ui->logBrowser->append(message);
     ui->toggleConnectionButton->setText("Close Connection\n(from sensor)");
+    emit signalSourceChanged(ballCommunication);
 }
 
 void MonitorView::onConnectionEnded(const QString& message)
