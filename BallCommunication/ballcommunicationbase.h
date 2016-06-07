@@ -5,11 +5,13 @@
 #include "Utilities/AccelerometerCalibrator/AccelerometerCalibrator.h"
 #include "Utilities/GyroCalibrator/GyroCalibrator.h"
 #include <iostream>
-#include <qtimer.h>
 #include <vector>
 #include <string>
-#include <qobject.h>
-#include <qdatetime.h>
+#include <QDateTime>
+#include <QObject>
+#include <QTimer>
+#include <QMutex>
+#include <QMutexLocker>
 
 using std::vector;
 using std::string;
@@ -24,9 +26,7 @@ public:
     bool isConnectionActive() { return connectionActive; }
     qint64 getConnectionStartedTime() { return connectionStartedTime; }
     string getName() { return name; }
-
-public:
-    vector<ProcessedBallData> getProcessedData() { return processedData; }
+    vector<ProcessedBallData> getProcessedData();
 
 protected:
     explicit BallCommunicationBase(QObject *parent = 0);
@@ -34,9 +34,13 @@ protected:
     qint64 connectionStartedTime = 0;
     string name = "Unintialized name";  // Set in deriving classes
 
+    void addProcessedData(ProcessedBallData data);
+    void clearProcessedData();
+
+private:
     // For storing all previous data
-    vector<RawBallData> rawData;
     vector<ProcessedBallData> processedData;
+    QMutex processedDataMutex;
 
 signals:
     void connectionOpened(const QString& message);

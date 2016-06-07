@@ -1,26 +1,26 @@
-#include "recognition.h"
-#include <QtConcurrent/QtConcurrent>
+//#include "recognition.h"
+//#include <QtConcurrent/QtConcurrent>
 
-Recognition::Recognition(QObject *parent) : QObject(parent)
-{
-    futureWatcher = new QFutureWatcher<void>(this);
-}
+//Recognition::Recognition(QObject *parent) : QObject(parent)
+//{
+//    futureWatcher = new QFutureWatcher<void>(this);
+//}
 
-void Recognition::initialize(GestureRecognition* gestureRecognition)
-{
-    this->gestureRecognition = gestureRecognition;
+//void Recognition::initialize(GestureRecognition* gestureRecognition)
+//{
+//    this->gestureRecognition = gestureRecognition;
 
-    connect(&recognitionTimer, SIGNAL(timeout()), this, SLOT(runRecognition()));
-    connect(gestureRecognition, SIGNAL(gestureRecognitionResult(string)), this, SIGNAL(gestureRecognitionResult(QString)));
-    recognitionTimer.start(300);
-}
+//    connect(&recognitionTimer, SIGNAL(timeout()), this, SLOT(runRecognition()));
+//    connect(gestureRecognition, SIGNAL(gestureRecognitionResult(string)), this, SIGNAL(gestureRecognitionResult(QString)));
+//    recognitionTimer.start(300);
+//}
 
-void Recognition::runRecognition()
-{
-    if (futureWatcher->isRunning())
-        return;
-    futureWatcher->setFuture(QtConcurrent::run([this]() -> void
-    {
-        gestureRecognition->runRecognition();
-    }));
-}
+//void Recognition::runRecognition()
+//{
+//    if (futureWatcher->isRunning())
+//        return;
+//    futureWatcher->setFuture(QtConcurrent::run([this]() -> void
+//    {
+//        gestureRecognition->runRecognition();
+//    }));
+//}

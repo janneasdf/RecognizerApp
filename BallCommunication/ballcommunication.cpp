@@ -131,7 +131,7 @@ void BallCommunicationReal::closeConnection(bool clearData)
     if (clearData)
     {
         rawData.clear();
-        processedData.clear();
+        clearProcessedData();
     }
 
     connectionActive = false;
@@ -176,7 +176,7 @@ void BallCommunicationReal::getNewData() {
     rawData.push_back(newRawData);
     ProcessedBallData newProcessedBallData = processedBallData;
     newProcessedBallData.t = QDateTime::currentMSecsSinceEpoch() - connectionStartedTime;
-    processedData.push_back(newProcessedBallData);
+    addProcessedData(newProcessedBallData);
 
     // Send signal about receiving data
     emit dataReceived(newProcessedBallData.t, newProcessedBallData.accelerationXYZNoG, newProcessedBallData.gyroXYZ);

@@ -67,7 +67,7 @@ connection not initialized from a file.");
 
     if(clearData)
     {
-        processedData.clear();
+        clearProcessedData();
     }
     emit connectionClosed(QString("Closed data reading connection from file: ") + currentFile);
     disconnect(&updateTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
@@ -88,7 +88,7 @@ void DataBallCommunication::receiveData()
             pbData.t = frame.timestamp;
             pbData.accelerationXYZNoG = frame.acceleration;
             pbData.gyroXYZ = frame.gyro;
-            processedData.push_back(pbData);
+            addProcessedData(pbData);
             emit dataReceived(frame.timestamp, frame.acceleration, frame.gyro);
             lastReadDataIndex++;    // so that we don't emit this same data frame again later
             break;

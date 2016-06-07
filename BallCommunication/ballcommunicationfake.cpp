@@ -40,6 +40,6 @@ void BallCommunicationFake::receiveData()
     fakeData.t = msecsFromStart;
     fakeData.accelerationXYZNoG = 10 * sin(msecsFromStart * 0.001);
     fakeData.gyroXYZ = 10 * cos(msecsFromStart * 0.001);
-    processedData.push_back(fakeData);
+    addProcessedData(fakeData);
     emit dataReceived(fakeData.t, fakeData.accelerationXYZNoG, fakeData.gyroXYZ);
 }
