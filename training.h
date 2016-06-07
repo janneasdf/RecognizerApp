@@ -12,6 +12,8 @@ public:
     explicit Training(QObject *parent = 0);
     ~Training();
 
+    void initialize(GestureRecognition* gestureRecognition);
+
     void trainWithData(const QString& dataFolder, const QStringList& trainingFilePaths);
 
 private:

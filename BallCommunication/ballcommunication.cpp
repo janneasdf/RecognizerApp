@@ -26,11 +26,11 @@ void BallCommunicationReal::tryReadData()
         return;
 
     // Read data asynchronously to not make GUI lag
-    QtConcurrent::run([this]() -> void
+    dataReadingWatcher->setFuture(QtConcurrent::run([this]() -> void
     {
       // Get newly received data, apply calibration, store it
       getNewData();
-    });
+    }));
 }
 
 void BallCommunicationReal::openConnection()

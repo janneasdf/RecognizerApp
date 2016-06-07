@@ -40,7 +40,7 @@ void MonitorView::onMessage(const QString &message)
 void MonitorView::onDataReceived(float timestamp, float acceleration, float gyro)
 {
     (void)timestamp;
-    ui->logBrowser->append(QString("Received data: ") + QString::number(acceleration) + QString::number(gyro));
+    ui->logBrowser->append(QString("Received data: ") + QString::number(timestamp) + QString::number(acceleration) + QString::number(gyro));
 }
 
 void MonitorView::clearButtonPressed()

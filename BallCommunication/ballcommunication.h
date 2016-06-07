@@ -36,10 +36,6 @@ private:
     // Communicator for communicating with ball and receiving data
     BallCommunicator ballCommunicator;
 
-    // For storing all previous data
-    vector<RawBallData> rawData;
-    vector<ProcessedBallData> processedData;
-
     // Timer for deciding when to read received data
     QTimer dataReadTimer;
 

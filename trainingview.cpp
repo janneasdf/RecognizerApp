@@ -12,9 +12,9 @@ TrainingView::TrainingView(QWidget *parent) :
 void TrainingView::initialize(Training *training)
 {
     this->training = training;
-    QObject::connect(training, SIGNAL(trainingStarted()), this, SLOT(onTrainingStarted()), Qt::UniqueConnection);
-    QObject::connect(training, SIGNAL(trainingCompleted()), this, SLOT(onTrainingCompleted()), Qt::UniqueConnection);
-    QObject::connect(ui->trainButton, SIGNAL(clicked(bool)), this, SLOT(startTraining()), Qt::UniqueConnection);
+    connect(training, SIGNAL(trainingStarted()), this, SLOT(onTrainingStarted()), Qt::UniqueConnection);
+    connect(training, SIGNAL(trainingCompleted()), this, SLOT(onTrainingCompleted()), Qt::UniqueConnection);
+    connect(ui->trainButton, SIGNAL(clicked(bool)), this, SLOT(startTraining()), Qt::UniqueConnection);
     initializeListViews();
 }
 

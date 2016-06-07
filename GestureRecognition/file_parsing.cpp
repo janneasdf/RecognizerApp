@@ -98,6 +98,7 @@ vector<labeled_event_data> read_labeled_training_data(const string data_folder, 
 			}
 			labeled_training_data.push_back(labeled_event_data);
 		}
+        cout << "Finished reading training data from file: " << filename << endl;
 	}
 	return labeled_training_data;
 }

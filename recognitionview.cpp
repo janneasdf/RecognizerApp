@@ -8,8 +8,50 @@ RecognitionView::RecognitionView(QWidget *parent) :
     ui->setupUi(this);
 }
 
-void RecognitionView::initialize()
+void RecognitionView::initialize(GestureRecognition* gestureRecognition)
 {
+    resetPlot();
+
+    this->gestureRecognition = gestureRecognition;
+
+    // Setup lag info updating (showing latency for receiving data)
+    QTimer* lagInfoUpdateTimer = new QTimer();
+    connect(lagInfoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateLagInfo()));
+    lagInfoUpdateTimer->start(1000);
+
+    // Update gesture recognition result (predicted gesture)
+    connect(gestureRecognition, SIGNAL(gestureRecognitionResult(QString)), this, SLOT(onRecognitionResult(QString)));
+}
+
+void RecognitionView::setDataSource(BallCommunicationBase* ballCommunication)
+{
+    if (this->ballCommunication)
+    {
+        // Disconnect from earlier source
+        disconnect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
+        // Clear graph when re-opening connection
+        disconnect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
+    }
+
+    this->ballCommunication = ballCommunication;
+
+    // Update plot when there's new data (todo: maybe not one per signal emission?)
+    connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
+    // Clear graph when re-opening connection
+    connect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
+    clearGraph();
+}
+
+void RecognitionView::resetPlot()
+{
+    if (sensorPlot)
+    {
+        // Clear old plot
+        disconnect(sensorPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), sensorPlot->xAxis2, SLOT(setRange(QCPRange)));
+        disconnect(sensorPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), sensorPlot->yAxis2, SLOT(setRange(QCPRange)));
+        delete sensorPlot;
+    }
+
     // Create plot that shows sensor values in real time
     sensorPlot = new QCustomPlot();
     ui->verticalLayout->addWidget(sensorPlot);
@@ -31,30 +73,6 @@ void RecognitionView::initialize()
     // Make left and bottom axes transfer their ranges to right and top axes:
     connect(sensorPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), sensorPlot->xAxis2, SLOT(setRange(QCPRange)));
     connect(sensorPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), sensorPlot->yAxis2, SLOT(setRange(QCPRange)));
-
-    // Setup lag info updating (showing latency for receiving data)
-    QTimer* lagInfoUpdateTimer = new QTimer();
-    connect(lagInfoUpdateTimer, SIGNAL(timeout()), this, SLOT(updateLagInfo()));
-    lagInfoUpdateTimer->start(1000);
-}
-
-void RecognitionView::setDataSource(BallCommunicationBase *ballCommunication)
-{
-    if (this->ballCommunication)
-    {
-        // Disconnect from earlier source
-        disconnect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
-        // Clear graph when re-opening connection
-        disconnect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
-    }
-
-    this->ballCommunication = ballCommunication;
-
-    // Update plot when there's new data (todo: maybe not one per signal emission?)
-    connect(ballCommunication, SIGNAL(dataReceived(float,float,float)), this, SLOT(updateGraph(float,float,float)));
-    // Clear graph when re-opening connection
-    connect(ballCommunication, SIGNAL(connectionOpened(QString)), this, SLOT(clearGraph()));
-    clearGraph();
 }
 
 void RecognitionView::onSignalSourceChanged(BallCommunicationBase *newSource)
@@ -74,8 +92,8 @@ void RecognitionView::updateGraph(float timestamp, float acceleration, float gyr
       sensorPlot->graph(0)->addData(time, value0);
       sensorPlot->graph(1)->addData(time, value1);
       // remove data of lines that's outside visible range:
-      sensorPlot->graph(0)->removeDataBefore(time-8);
-      sensorPlot->graph(1)->removeDataBefore(time-8);
+//      sensorPlot->graph(0)->removeDataBefore(time-8);
+//      sensorPlot->graph(1)->removeDataBefore(time-8);
       // rescale value (vertical) axis to fit the current data:
       sensorPlot->graph(0)->rescaleValueAxis();
       sensorPlot->graph(1)->rescaleValueAxis(true);
@@ -88,8 +106,12 @@ void RecognitionView::updateGraph(float timestamp, float acceleration, float gyr
 
 void RecognitionView::clearGraph()
 {
-    sensorPlot->graph(0)->clearData();
-    sensorPlot->graph(1)->clearData();
+//    sensorPlot->graph(0)->clearData();
+//    sensorPlot->graph(1)->clearData();
+//    delete sensorPlot;
+//    createGraph();
+//    sensorPlot->clearGraphs();    // deletes graphs
+    resetPlot();
     previousUpdateTimestamp = 0;
 }
 
@@ -98,6 +120,11 @@ void RecognitionView::updateLagInfo()
     qint64 lag = (QDateTime::currentMSecsSinceEpoch() - ballCommunication->getConnectionStartedTime()) - previousUpdateTimestamp;
     QString lagText = QString("Current lag: ") + QString::number(lag) + QString(" milliseconds. ");
     ui->currentLagLabel->setText(lagText);
+}
+
+void RecognitionView::onRecognitionResult(const QString &label)
+{
+    ui->predictionLabel->setText(QString("Predicted Gesture: ") + label);
 }
 
 RecognitionView::~RecognitionView()

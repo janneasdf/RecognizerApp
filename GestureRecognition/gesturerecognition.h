@@ -5,7 +5,13 @@
 #include <vector>
 #include <iostream>
 #include <QObject>
+#include <QTimer>
+#include <QFutureWatcher>
 #include "recognizer.h"
+#include "BallCommunication/ballcommunicationbase.h"
+
+// todo: maybe don't use types from BallCommunication
+#include "BallCommunication/declaration.h"
 
 using std::string;
 using std::vector;
@@ -28,14 +34,24 @@ public:
     void stopRecognition();
     void restartGestureRecognition();
 
+
 private:
     Recognizer recognizer;
+    QTimer gestureRecognitionTimer;
+    QFutureWatcher<void>* recognitionWatcher;
+
+    BallCommunicationBase* ballCommunication = 0;
+    MatrixDouble getReceivedData();
 
 public slots:
     void trainFromData(const QString& dataFolder, const QStringList& filenames);
+    void onDataSourceChanged(BallCommunicationBase* ballCommunication);
+
+private slots:
+    void runRecognition();
 
 signals:
-    void gestureRecognitionResult(string result);
+    void gestureRecognitionResult(const QString& result);
     void trainingStarted();
     void trainingCompleted();
     void trainingError(const QString& error);

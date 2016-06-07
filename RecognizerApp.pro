@@ -167,7 +167,8 @@ SOURCES += main.cpp\
     recognitionview.cpp \
     BallCommunication/ballcommunicationbase.cpp \
     BallCommunication/ballcommunicationfake.cpp \
-    BallCommunication/databallcommunication.cpp
+    BallCommunication/databallcommunication.cpp \
+    recognition.cpp
 
 HEADERS  += mainwindow.h \
     BallCommunication/Libraries/SDL/include/begin_code.h \
@@ -389,7 +390,8 @@ HEADERS  += mainwindow.h \
     BallCommunication/ballcommunicationbase.h \
     BallCommunication/ballcommunicationfake.h \
     BallCommunication/databallcommunication.h \
-    BallCommunication/sensordataframe.h
+    BallCommunication/sensordataframe.h \
+    recognition.h
 
 FORMS    += mainwindow.ui \
     monitorview.ui \

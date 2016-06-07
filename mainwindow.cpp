@@ -7,6 +7,7 @@
 #include "BallCommunication/ballcommunication.h"
 #include "BallCommunication/ballcommunicationfake.h"
 #include "BallCommunication/databallcommunication.h"
+#include "GestureRecognition/gesturerecognition.h"
 #include <memory>
 #include <stdio.h>
 
@@ -21,13 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    fclose(stdout);
-//    std::cout.setstate(std::ios_base::failbit); // turn off cout
-
-    Training* training = new Training(this);
-    TrainingView* trainingView = new TrainingView(this);
-    trainingView->initialize(training);
-
 #if FAKE_COMMUNICATION
     BallCommunicationBase* ballCommunication = new BallCommunicationFake(this);
 #else
@@ -35,11 +29,18 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
     DataBallCommunication* dataBallCommunication = new DataBallCommunication(this);
 
+    GestureRecognition* gestureRecognition = new GestureRecognition();
+
+    Training* training = new Training(this);
+    training->initialize(gestureRecognition);
+    TrainingView* trainingView = new TrainingView(this);
+    trainingView->initialize(training);
+
     MonitorView* monitorView = new MonitorView(this);
     monitorView->initialize(ballCommunication, dataBallCommunication);
 
     RecognitionView* recognitionView = new RecognitionView(this);
-    recognitionView->initialize();
+    recognitionView->initialize(gestureRecognition);
     recognitionView->setDataSource(ballCommunication);
 
     ui->trainingLayout->addWidget(trainingView);
@@ -47,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->recognitionLayout->addWidget(recognitionView);
 
     connect(monitorView, SIGNAL(signalSourceChanged(BallCommunicationBase*)), recognitionView, SLOT(onSignalSourceChanged(BallCommunicationBase*)));
+    connect(monitorView, SIGNAL(signalSourceChanged(BallCommunicationBase*)), gestureRecognition, SLOT(onDataSourceChanged(BallCommunicationBase*)));
 }
 
 MainWindow::~MainWindow()

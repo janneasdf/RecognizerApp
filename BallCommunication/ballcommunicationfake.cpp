@@ -36,5 +36,10 @@ void BallCommunicationFake::closeConnection(bool clearData)
 void BallCommunicationFake::receiveData()
 {
     qint64 msecsFromStart = QDateTime::currentMSecsSinceEpoch() - connectionStartedTime;
-    emit dataReceived(msecsFromStart, 10 * sin(msecsFromStart * 0.001), 10 * cos(msecsFromStart * 0.001));
+    ProcessedBallData fakeData;
+    fakeData.t = msecsFromStart;
+    fakeData.accelerationXYZNoG = 10 * sin(msecsFromStart * 0.001);
+    fakeData.gyroXYZ = 10 * cos(msecsFromStart * 0.001);
+    processedData.push_back(fakeData);
+    emit dataReceived(fakeData.t, fakeData.accelerationXYZNoG, fakeData.gyroXYZ);
 }

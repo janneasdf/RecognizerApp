@@ -25,11 +25,18 @@ public:
     qint64 getConnectionStartedTime() { return connectionStartedTime; }
     string getName() { return name; }
 
+public:
+    vector<ProcessedBallData> getProcessedData() { return processedData; }
+
 protected:
     explicit BallCommunicationBase(QObject *parent = 0);
     bool connectionActive = false;
     qint64 connectionStartedTime = 0;
     string name = "Unintialized name";  // Set in deriving classes
+
+    // For storing all previous data
+    vector<RawBallData> rawData;
+    vector<ProcessedBallData> processedData;
 
 signals:
     void connectionOpened(const QString& message);

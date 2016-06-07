@@ -3,11 +3,19 @@
 #include "sensor_events.h"
 #include "event_type_converter.h"
 #include "GRT_helper.h"
+#include <QtConcurrent/QtConcurrent>
 
 GestureRecognition::GestureRecognition(QObject* parent) : QObject(parent)
 {
-    QObject::connect(&recognizer, SIGNAL(trainingStarted()), this, SIGNAL(trainingStarted()));
-    QObject::connect(&recognizer, SIGNAL(trainingCompleted()), this, SIGNAL(trainingCompleted()));
+    connect(&recognizer, SIGNAL(trainingStarted()), this, SIGNAL(trainingStarted()));
+    connect(&recognizer, SIGNAL(trainingCompleted()), this, SIGNAL(trainingCompleted()));
+    connect(&recognizer, SIGNAL(recognitionResult(QString)), this, SIGNAL(gestureRecognitionResult(QString)));
+
+    gestureRecognitionTimer.start(500);
+    connect(&gestureRecognitionTimer, SIGNAL(timeout()), this, SLOT(runRecognition()));
+
+    // For concurrent (asynchronous) gesture recognition
+    recognitionWatcher = new QFutureWatcher<void>(this);
 }
 
 void GestureRecognition::trainFromData(const QString& trainingFolder, const QStringList& filenames)
@@ -24,6 +32,21 @@ void GestureRecognition::trainFromData(const QString& trainingFolder, const QStr
     TimeSeriesClassificationData grtData = extract_training_data(labeledData, eventTypeConverter);
 
     recognizer.trainFromData(grtData);
+}
+
+void GestureRecognition::onDataSourceChanged(BallCommunicationBase *ballCommunication)
+{
+    this->ballCommunication = ballCommunication;
+}
+
+void GestureRecognition::runRecognition()
+{
+    if (recognitionWatcher->isRunning())
+        return;
+    recognitionWatcher->setFuture(QtConcurrent::run([this]() -> void
+    {
+        recognizer.runRecognition(getReceivedData());
+    }));
 }
 
 void GestureRecognition::setParameters()
@@ -45,3 +68,20 @@ void GestureRecognition::restartGestureRecognition()
 {
 
 }
+
+MatrixDouble GestureRecognition::getReceivedData()
+{
+    MatrixDouble dataMatrix;
+    if (!ballCommunication)
+        return dataMatrix;
+
+    auto data = ballCommunication->getProcessedData();
+    for (auto& ballData : data)
+    {
+        VectorDouble row;
+        row.push_back(ballData.accelerationXYZNoG);
+        row.push_back(ballData.gyroXYZ);
+        dataMatrix.push_back(row);
+    }
+}
+
