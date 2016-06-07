@@ -31,7 +31,7 @@ void GestureRecognition::trainFromData(const QString& trainingFolder, const QStr
     eventTypeConverter.initialize(labeledData);
     TimeSeriesClassificationData grtData = extract_training_data(labeledData, eventTypeConverter);
 
-    recognizer.trainFromData(grtData);
+    recognizer.trainFromData(grtData, eventTypeConverter);
 }
 
 void GestureRecognition::onDataSourceChanged(BallCommunicationBase *ballCommunication)
@@ -83,5 +83,6 @@ MatrixDouble GestureRecognition::getReceivedData()
         row.push_back(ballData.gyroXYZ);
         dataMatrix.push_back(row);
     }
+    return dataMatrix;
 }
 

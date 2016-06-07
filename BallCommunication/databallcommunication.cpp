@@ -65,7 +65,10 @@ void DataBallCommunication::closeConnection(bool clearData)
     if (!initialized) throw std::exception("Cannot close data connection; \
 connection not initialized from a file.");
 
-    (void)clearData;
+    if(clearData)
+    {
+        processedData.clear();
+    }
     emit connectionClosed(QString("Closed data reading connection from file: ") + currentFile);
     disconnect(&updateTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
     updateTimer.stop();
@@ -81,6 +84,11 @@ void DataBallCommunication::receiveData()
         SensorDataFrame& frame = data[lastReadDataIndex];
         if (frame.timestamp >= msecsFromStart)
         {
+            ProcessedBallData pbData;
+            pbData.t = frame.timestamp;
+            pbData.accelerationXYZNoG = frame.acceleration;
+            pbData.gyroXYZ = frame.gyro;
+            processedData.push_back(pbData);
             emit dataReceived(frame.timestamp, frame.acceleration, frame.gyro);
             lastReadDataIndex++;    // so that we don't emit this same data frame again later
             break;

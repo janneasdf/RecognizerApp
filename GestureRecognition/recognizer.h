@@ -14,14 +14,15 @@ public:
     explicit Recognizer(QObject *parent = 0);
 
     // Clears earlier training and trains the model on given data
-    void trainFromData(const TimeSeriesClassificationData& trainingData);
+    void trainFromData(const TimeSeriesClassificationData& trainingData, event_type_converter eventNames);
 
-    // Try to recognize gesture (parameter is copied in case the original is changed in another thread)
-    void Recognizer::runRecognition(MatrixDouble& dataCopy);
+    void Recognizer::runRecognition(MatrixDouble dataCopy);
 
 private:
     GestureRecognitionPipeline pipeline;
     std::unique_ptr<HMM> hmm;
+
+    event_type_converter gestureNames;
 
     /* Recognition parameters */
     int windowSize;
