@@ -29,3 +29,9 @@ std::vector<labeled_event_data> read_labeled_training_data(const string data_fol
 
 /* Reads sensor data from file */
 vector<sensor_frame> read_sensor_data(string sensor_data_filename);
+
+/* Read labeled training data, with each event marker as a separate gesture,
+ * where a gesture starts with the event marker and is window_size long
+ * (therefore, there is no end marker).
+*/
+vector<labeled_event_data> read_labeled_training_data_separate(const string data_folder, const vector<string>& training_data_filenames, float window_size);

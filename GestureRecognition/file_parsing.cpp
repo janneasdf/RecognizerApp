@@ -83,7 +83,7 @@ vector<labeled_event_data> read_labeled_training_data(const string data_folder, 
 		if (event_markers.size() % 2 != 0) {
 			throw exception("Event markers amount is not divisible by two (all events should consist of two markers (currently)). ");
 		}
-		int num_events = event_markers.size() / 2;
+        size_t num_events = event_markers.size() / 2;
 		/* Loop through events */
 		int frame_index = 0;
 		for (int event_index = 0; event_index < num_events; ++event_index) {
@@ -101,4 +101,39 @@ vector<labeled_event_data> read_labeled_training_data(const string data_folder, 
         cout << "Finished reading training data from file: " << filename << endl;
 	}
 	return labeled_training_data;
+}
+
+vector<labeled_event_data> read_labeled_training_data_separate(const string data_folder, const vector<string>& training_data_filenames, float window_size)
+{
+    vector<labeled_event_data> labeled_training_data;
+    for (string filename : training_data_filenames) {
+        cout << "Extracting training data from file: " << filename << endl;
+        /* Format of data files is data_folder + filename + .dat, format of event files is data_folder + filename + _events + .dat */
+        string sensor_data_filename = data_folder + filename + ".dat";
+        string event_data_filename = data_folder + filename + "_events.dat";
+        /* Read sensor frames (time, acceleration, compass, gyro) */
+        vector<sensor_frame> sensor_frames;
+        sensor_frames = read_sensor_data(sensor_data_filename);
+        /* Open event data file and extract event data */
+        vector<event_marker> event_markers = read_event_markers_from_file(event_data_filename);
+        /* Read window_size sized window of data after each event marker as an event */
+        int frame_index = 0;
+        for (int event_index = 0; event_index < event_markers.size(); ++event_index)
+        {
+            auto& event = event_markers[event_index];
+            labeled_event_data event_data;
+            event_data.type = event.type;
+            /* Skip frames before start of event */
+            while (sensor_frames[frame_index].time < event.time) frame_index++;
+            /* Read data window_size long data */
+            while (sensor_frames[frame_index].time < event.time + window_size)
+            {
+                event_data.sensor_data.push_back(sensor_frames[frame_index]);
+                frame_index++;
+            }
+            labeled_training_data.push_back(event_data);
+        }
+        cout << "Finished reading training data from file: " << filename << endl;
+    }
+    return labeled_training_data;
 }
