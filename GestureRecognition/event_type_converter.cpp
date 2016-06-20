@@ -18,8 +18,8 @@ void event_type_converter::initialize(vector<labeled_event_data> event_data)
 	copy(set_event_types.begin(), set_event_types.end(), back_inserter(event_types));
 
 	/* Create int<->event relations */
-	map_int_to_event[0] = "No event";
-	map_event_to_int["No event"] = 0;
+    map_int_to_event[0] = "No gesture";
+    map_event_to_int["No gesture"] = 0;
 	int current_class = 1;
 	for (string event_type : event_types)
 	{

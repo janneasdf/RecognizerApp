@@ -47,7 +47,6 @@ SOURCES += main.cpp\
     BallCommunication/Networking/Timer/Timer.cpp \
     BallCommunication/Utilities/AccelerometerCalibrator/AccelerometerCalibrator.cpp \
     BallCommunication/Utilities/GyroCalibrator/GyroCalibrator.cpp \
-    BallCommunication/ballcommunication.cpp \
     GestureRecognition/gesturerecognition.cpp \
     mainlogic.cpp \
     monitorview.cpp \
@@ -168,7 +167,7 @@ SOURCES += main.cpp\
     BallCommunication/ballcommunicationbase.cpp \
     BallCommunication/ballcommunicationfake.cpp \
     BallCommunication/databallcommunication.cpp \
-    recognition.cpp
+    BallCommunication/ballcommunicationreal.cpp
 
 HEADERS  += mainwindow.h \
     BallCommunication/Libraries/SDL/include/begin_code.h \
@@ -227,7 +226,6 @@ HEADERS  += mainwindow.h \
     BallCommunication/Networking/Timer/Timer.h \
     BallCommunication/Utilities/AccelerometerCalibrator/AccelerometerCalibrator.h \
     BallCommunication/Utilities/GyroCalibrator/GyroCalibrator.h \
-    BallCommunication/ballcommunication.h \
     BallCommunication/declaration.h \
     GestureRecognition/gesturerecognition.h \
     mainlogic.h \
@@ -391,7 +389,7 @@ HEADERS  += mainwindow.h \
     BallCommunication/ballcommunicationfake.h \
     BallCommunication/databallcommunication.h \
     BallCommunication/sensordataframe.h \
-    recognition.h
+    BallCommunication/ballcommunicationreal.h
 
 FORMS    += mainwindow.ui \
     monitorview.ui \

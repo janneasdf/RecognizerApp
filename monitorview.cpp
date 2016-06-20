@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QFileDialog>
+#include <QtConcurrent/QtConcurrent>
 
 MonitorView::MonitorView(QWidget *parent) : QWidget(parent), ui(new Ui::MonitorView)
 {
@@ -39,8 +40,12 @@ void MonitorView::onMessage(const QString &message)
 
 void MonitorView::onDataReceived(float timestamp, float acceleration, float gyro)
 {
-    (void)timestamp;
-    ui->logBrowser->append(QString("Received data: ") + QString::number(timestamp) + QString::number(acceleration) + QString::number(gyro));
+    QString logLine = QString("Received data: ");
+    //logLine += QString::number(timestamp);
+    logLine += QString::number(acceleration);
+    logLine += ", ";
+    logLine += QString::number(gyro);
+    ui->logBrowser->append(logLine);
 }
 
 void MonitorView::clearButtonPressed()
@@ -52,12 +57,15 @@ void MonitorView::toggleConnectionButtonPressed()
 {
     if (ballCommunication->isConnectionActive())
     {
-        ballCommunication->closeConnection(true);
+        ui->toggleConnectionButton->setText("Closing connection...");
+
+        ballCommunication->closeConnection(false);
     }
     else
     {
         try
         {
+            ui->toggleConnectionButton->setText("Opening connection...");
             ballCommunication->openConnection();
         }
         catch (std::exception e)
@@ -83,13 +91,13 @@ void MonitorView::onConnectionEnded(const QString& message)
     ui->toggleConnectionButton->setText("Open connection\n(from sensor)");
 }
 
-
 /********** Data connection (reading input from file) slots **********/
 void MonitorView::dataConnectionButtonPressed()
 {
     if (dataBallCommunication->isConnectionActive())
     {
-        dataBallCommunication->closeConnection(true);
+        ui->fileConnectionButton->setText("Closing connection...");
+        dataBallCommunication->closeConnection(false);
     }
     else
     {
@@ -101,6 +109,7 @@ void MonitorView::dataConnectionButtonPressed()
         // Initialize with data from selected file
         try
         {
+            ui->fileConnectionButton->setText("Opening connection...");
             dataBallCommunication->initializeFromFile(filename);
             dataBallCommunication->openConnection();
         }

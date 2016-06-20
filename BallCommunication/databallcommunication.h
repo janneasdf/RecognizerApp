@@ -27,6 +27,7 @@ public:
     void closeConnection(bool clearData) override;
 
 private:
+    const int dataReadInterval = 1000.0 / 150.0;
     QTimer updateTimer;
     QString currentFile;
     bool initialized = false;

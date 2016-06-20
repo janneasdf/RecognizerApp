@@ -16,7 +16,7 @@ void print_sample_distribution(TimeSeriesClassificationData& data, const event_t
 TimeSeriesClassificationData extract_training_data(const vector<labeled_event_data>& labeled_training_data,
     const event_type_converter& event_type_converter) {
     TimeSeriesClassificationData training_data;
-    training_data.setNumDimensions(1);
+    training_data.setNumDimensions(2); // Accelerometer, gyroscope
     for (const labeled_event_data& event : labeled_training_data) {
         /* Don't add data if it's empty */
         if (event.sensor_data.empty())
@@ -26,6 +26,7 @@ TimeSeriesClassificationData extract_training_data(const vector<labeled_event_da
             const sensor_frame& frame = event.sensor_data[i];
             VectorDouble sensor_data_row;
             sensor_data_row.push_back(frame.acceleration);
+            sensor_data_row.push_back(frame.gyro);
             training_sample.push_back(sensor_data_row);
         }
         if (!training_data.addSample(event_type_converter.event_type_to_int(event.type), training_sample)) {

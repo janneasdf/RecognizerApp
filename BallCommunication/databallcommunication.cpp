@@ -54,7 +54,7 @@ connection not initialized from a file.");
 
     emit connectionOpened(QString("Opened data reading connection from file: ") + currentFile);
     connect(&updateTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
-    updateTimer.start(60);
+    updateTimer.start(dataReadInterval);
     connectionStartedTime = QDateTime::currentMSecsSinceEpoch();
     connectionActive = true;
 }

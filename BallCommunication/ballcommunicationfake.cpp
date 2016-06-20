@@ -17,7 +17,7 @@ void BallCommunicationFake::openConnection()
 
     emit connectionOpened(QString("Opened fake connection"));
     connect(&updateTimer, SIGNAL(timeout()), this, SLOT(receiveData()));
-    updateTimer.start(60);
+    updateTimer.start(dataReadInterval);
     connectionStartedTime = QDateTime::currentMSecsSinceEpoch();
     connectionActive = true;
 }

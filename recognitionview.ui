@@ -34,8 +34,22 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
      <property name="text">
       <string>Predicted Gesture: </string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="predictionLagLabel">
+     <property name="text">
+      <string>Prediction lag: </string>
      </property>
     </widget>
    </item>
@@ -48,7 +62,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>Signal lag: </string>
      </property>
     </widget>
    </item>

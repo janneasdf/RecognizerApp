@@ -2,7 +2,7 @@
 
 Recognizer::Recognizer(QObject *parent) : QObject(parent)
 {
-    pipeline.addPreProcessingModule(MovingAverageFilter(5, 1));
+    pipeline.addPreProcessingModule(MovingAverageFilter(5, 2));
 }
 
 void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData, event_type_converter gestureNames)
@@ -10,7 +10,7 @@ void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData,
     emit trainingStarted();
     try
     {
-        hmm = std::make_unique<HMM>(setup_HMM(10));
+        hmm = std::make_unique<HMM>(setup_HMM(5));
         pipeline.setClassifier(*hmm.get());
         pipeline.train(trainingData);
     }
@@ -25,24 +25,27 @@ void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData,
 
 void Recognizer::runRecognition(MatrixDouble dataCopy)
 {
-    windowSize = 100;
+    windowSize = 1000;
 
-    if (dataCopy.getSize() < windowSize)
-    {
-        emit recognitionResult(QString("Not enough data for gesture prediction"));
-        return;
-    }
     if (!pipeline.getTrained())
     {
         emit recognitionResult(QString("Gesture recognition model hasn't been trained"));
+        return;
+    }
+    if (dataCopy.getSize() < windowSize)
+    {
+        emit recognitionResult(QString("Not enough data for gesture prediction"));
         return;
     }
 
     pipeline.predict(dataCopy);
 
     UINT label = pipeline.getPredictedClassLabel();
+
+    if (label)
+        int x = 1;
+
     QString gesture = QString::fromStdString(gestureNames.int_to_event_type(label));
 
     emit recognitionResult(gesture);
-//    emit recognitionResult(QString("Fake recognition result"));
 }

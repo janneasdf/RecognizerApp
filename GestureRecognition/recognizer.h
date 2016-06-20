@@ -25,7 +25,7 @@ private:
     event_type_converter gestureNames;
 
     /* Recognition parameters */
-    int windowSize;
+    size_t windowSize;
 
 signals:
     void trainingStarted();

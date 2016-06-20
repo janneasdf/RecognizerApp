@@ -4,7 +4,7 @@
 #include "training.h"
 #include "trainingview.h"
 #include "recognitionview.h"
-#include "BallCommunication/ballcommunication.h"
+#include "BallCommunication/ballcommunicationreal.h"
 #include "BallCommunication/ballcommunicationfake.h"
 #include "BallCommunication/databallcommunication.h"
 #include "GestureRecognition/gesturerecognition.h"
@@ -14,7 +14,7 @@
 using std::shared_ptr;
 
 // Define this as 1 if you don't have the ball ready
-#define FAKE_COMMUNICATION 1
+#define FAKE_COMMUNICATION 0
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #if FAKE_COMMUNICATION
     BallCommunicationBase* ballCommunication = new BallCommunicationFake(this);
 #else
-    BallCommunicationBase* ballCommunication = new BallCommunication(this);
+    BallCommunicationBase* ballCommunication = new BallCommunicationReal(this);
 #endif
     DataBallCommunication* dataBallCommunication = new DataBallCommunication(this);
 

@@ -1,4 +1,4 @@
-#include "ballcommunication.h"
+#include "ballcommunicationreal.h"
 #include "declaration.h"
 #include <stdexcept>
 #include "Libraries/SDL/include/SDL.h"
@@ -6,6 +6,7 @@
 #include "Networking/Network/Network.h"
 #include "Networking/BallCommunicator/BallCommunicator_UDP.h"
 #include <QtConcurrent/QtConcurrent>
+#include <QDateTime>
 
 BallCommunicationReal::BallCommunicationReal(QObject *parent) : BallCommunicationBase(parent)
 {
@@ -114,6 +115,10 @@ void BallCommunicationReal::openConnection()
 
 void BallCommunicationReal::closeConnection(bool clearData)
 {
+    // Stop reading data
+    QObject::disconnect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(tryReadData()));
+    dataReadTimer.stop();
+
     if (!flagNetworkFromUDP){
         ballCommunicator.finalize();
     }else{
@@ -125,8 +130,6 @@ void BallCommunicationReal::closeConnection(bool clearData)
     SDLNet_Quit();
     SDL_Quit();
 
-    QObject::disconnect(&dataReadTimer, SIGNAL(timeout()), this, SLOT(tryReadData()));
-    dataReadTimer.stop();
 
     if (clearData)
     {

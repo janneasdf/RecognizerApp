@@ -35,6 +35,8 @@ private:
 
     Ui::RecognitionView *ui;
 
+    qint64 previousPrediction = 0;
+
 public slots:
     void onSignalSourceChanged(BallCommunicationBase* newSource);
 

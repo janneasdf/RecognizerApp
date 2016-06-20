@@ -27,7 +27,7 @@ public:
     void closeConnection(bool clearData) override;
 
 private:
-    const int dataReadInterval = 1000.0 / 10.0; // milliseconds
+    const int dataReadInterval = 1000.0 / 150.0;
 
     // For storing all received raw data
     vector<RawBallData> rawData;

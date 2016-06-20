@@ -11,7 +11,7 @@ GestureRecognition::GestureRecognition(QObject* parent) : QObject(parent)
     connect(&recognizer, SIGNAL(trainingCompleted()), this, SIGNAL(trainingCompleted()));
     connect(&recognizer, SIGNAL(recognitionResult(QString)), this, SIGNAL(gestureRecognitionResult(QString)));
 
-    gestureRecognitionTimer.start(500);
+    gestureRecognitionTimer.start(100);
     connect(&gestureRecognitionTimer, SIGNAL(timeout()), this, SLOT(runRecognition()));
 
     // For concurrent (asynchronous) gesture recognition

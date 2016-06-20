@@ -21,6 +21,8 @@ void RecognitionView::initialize(GestureRecognition* gestureRecognition)
 
     // Update gesture recognition result (predicted gesture)
     connect(gestureRecognition, SIGNAL(gestureRecognitionResult(QString)), this, SLOT(onRecognitionResult(QString)));
+
+    previousPrediction = QDateTime::currentMSecsSinceEpoch();
 }
 
 void RecognitionView::setDataSource(BallCommunicationBase* ballCommunication)
@@ -106,11 +108,6 @@ void RecognitionView::updateGraph(float timestamp, float acceleration, float gyr
 
 void RecognitionView::clearGraph()
 {
-//    sensorPlot->graph(0)->clearData();
-//    sensorPlot->graph(1)->clearData();
-//    delete sensorPlot;
-//    createGraph();
-//    sensorPlot->clearGraphs();    // deletes graphs
     resetPlot();
     previousUpdateTimestamp = 0;
 }
@@ -118,13 +115,16 @@ void RecognitionView::clearGraph()
 void RecognitionView::updateLagInfo()
 {
     qint64 lag = (QDateTime::currentMSecsSinceEpoch() - ballCommunication->getConnectionStartedTime()) - previousUpdateTimestamp;
-    QString lagText = QString("Current lag: ") + QString::number(lag) + QString(" milliseconds. ");
+    QString lagText = QString("Signal lag: ") + QString::number(lag) + QString(" milliseconds. ");
     ui->currentLagLabel->setText(lagText);
 }
 
 void RecognitionView::onRecognitionResult(const QString &label)
 {
+    qint64 timeSinceLastPrediction = previousPrediction - QDateTime::currentMSecsSinceEpoch();
     ui->predictionLabel->setText(QString("Predicted Gesture: ") + label);
+    ui->predictionLagLabel->setText(QString("Prediction lag: ") + QString::number(timeSinceLastPrediction) + "ms");
+    previousPrediction = QDateTime::currentMSecsSinceEpoch();
 }
 
 RecognitionView::~RecognitionView()
