@@ -4,12 +4,13 @@
 #include "event_type_converter.h"
 #include "GRT_helper.h"
 #include <QtConcurrent/QtConcurrent>
+#include "config.h"
 
 GestureRecognition::GestureRecognition(QObject* parent) : QObject(parent)
 {
     connect(&recognizer, SIGNAL(trainingStarted()), this, SIGNAL(trainingStarted()));
     connect(&recognizer, SIGNAL(trainingCompleted()), this, SIGNAL(trainingCompleted()));
-    connect(&recognizer, SIGNAL(recognitionResult(QString)), this, SIGNAL(gestureRecognitionResult(QString)));
+    connect(&recognizer, SIGNAL(recognitionResult(QString, UINT, QString, float, float)), this, SIGNAL(gestureRecognitionResult(QString, UINT, QString, float, float)));
 
     gestureRecognitionTimer.start(100);
     connect(&gestureRecognitionTimer, SIGNAL(timeout()), this, SLOT(runRecognition()));
@@ -26,7 +27,9 @@ void GestureRecognition::trainFromData(const QString& trainingFolder, const QStr
     {
         filenames_std.push_back(filename.toStdString());
     }
-    vector<labeled_event_data> labeledData = read_labeled_training_data(trainingFolder.toStdString(), filenames_std);
+//    vector<labeled_event_data> labeledData = read_labeled_training_data(trainingFolder.toStdString(), filenames_std);
+    float gestureWindowSize = config::GESTURE_WINDOW_SIZE;
+    vector<labeled_event_data> labeledData = parse_helpers::read_labeled_training_data_separate(trainingFolder.toStdString(), filenames_std, gestureWindowSize);
     event_type_converter eventTypeConverter;
     eventTypeConverter.initialize(labeledData);
     TimeSeriesClassificationData grtData = extract_training_data(labeledData, eventTypeConverter);
@@ -45,7 +48,9 @@ void GestureRecognition::runRecognition()
         return;
     recognitionWatcher->setFuture(QtConcurrent::run([this]() -> void
     {
-        recognizer.runRecognition(getReceivedData());
+        vector<float> timestamps;
+        MatrixDouble data = getReceivedData(timestamps);
+        recognizer.runRecognition(data, timestamps);
     }));
 }
 
@@ -69,19 +74,21 @@ void GestureRecognition::restartGestureRecognition()
 
 }
 
-MatrixDouble GestureRecognition::getReceivedData()
+MatrixDouble GestureRecognition::getReceivedData(vector<float>& timestamps)
 {
     MatrixDouble dataMatrix;
     if (!ballCommunication)
         return dataMatrix;
 
     auto data = ballCommunication->getProcessedData();
+    timestamps.clear();
     for (auto& ballData : data)
     {
         VectorDouble row;
         row.push_back(ballData.accelerationXYZNoG);
         row.push_back(ballData.gyroXYZ);
         dataMatrix.push_back(row);
+        timestamps.push_back(ballData.t);
     }
     return dataMatrix;
 }

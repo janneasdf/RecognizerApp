@@ -20,7 +20,7 @@ void RecognitionView::initialize(GestureRecognition* gestureRecognition)
     lagInfoUpdateTimer->start(1000);
 
     // Update gesture recognition result (predicted gesture)
-    connect(gestureRecognition, SIGNAL(gestureRecognitionResult(QString)), this, SLOT(onRecognitionResult(QString)));
+    connect(gestureRecognition, SIGNAL(gestureRecognitionResult(QString, UINT, QString, float, float)), this, SLOT(onRecognitionResult(QString, UINT, QString, float, float)));
 
     previousPrediction = QDateTime::currentMSecsSinceEpoch();
 }
@@ -114,17 +114,31 @@ void RecognitionView::clearGraph()
 
 void RecognitionView::updateLagInfo()
 {
-    qint64 lag = (QDateTime::currentMSecsSinceEpoch() - ballCommunication->getConnectionStartedTime()) - previousUpdateTimestamp;
+    qint64 sinceConnectionStart = QDateTime::currentMSecsSinceEpoch() - ballCommunication->getConnectionStartedTime();
+    long long lag = sinceConnectionStart - previousUpdateTimestamp;
     QString lagText = QString("Signal lag: ") + QString::number(lag) + QString(" milliseconds. ");
     ui->currentLagLabel->setText(lagText);
 }
 
-void RecognitionView::onRecognitionResult(const QString &label)
+void RecognitionView::onRecognitionResult(const QString& result, UINT label, const QString& gestureName, float gestureStartTime, float gestureEndTime)
 {
-    qint64 timeSinceLastPrediction = previousPrediction - QDateTime::currentMSecsSinceEpoch();
+    qint64 timeSinceLastPrediction = QDateTime::currentMSecsSinceEpoch() - previousPrediction;
     ui->predictionLabel->setText(QString("Predicted Gesture: ") + label);
     ui->predictionLagLabel->setText(QString("Prediction lag: ") + QString::number(timeSinceLastPrediction) + "ms");
     previousPrediction = QDateTime::currentMSecsSinceEpoch();
+
+    // Check for no gesture
+    if (label < 1)
+        return;
+
+    // Add vertical line(s) into graph to indicate gesture (start and end)
+    (void)gestureStartTime;
+    sensorPlot->addGraph();
+    sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureStartTime, -99999);
+    sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureStartTime+0.001, 99999);
+    sensorPlot->addGraph();
+    sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureEndTime, -99999);
+    sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureEndTime+0.001, 99999);
 }
 
 RecognitionView::~RecognitionView()

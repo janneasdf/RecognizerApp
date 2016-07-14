@@ -6,6 +6,10 @@
 #include <QObject>
 #include <QFutureWatcher>
 #include "GRT_helper.h"
+#include <string>
+
+using std::string;
+using std::vector;
 
 class Recognizer : public QObject
 {
@@ -16,7 +20,7 @@ public:
     // Clears earlier training and trains the model on given data
     void trainFromData(const TimeSeriesClassificationData& trainingData, event_type_converter eventNames);
 
-    void Recognizer::runRecognition(MatrixDouble dataCopy);
+    void Recognizer::runRecognition(MatrixDouble dataCopy, vector<float> timestamps);
 
 private:
     GestureRecognitionPipeline pipeline;
@@ -32,7 +36,7 @@ signals:
     void trainingCompleted();
     void trainingError(const QString& error);
 
-    void recognitionResult(const QString& label);
+    void recognitionResult(const QString& result, UINT gesture, const QString& gestureName, float gestureStartTime, float gestureEndTime);
 
 public slots:
 

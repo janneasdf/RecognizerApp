@@ -4,23 +4,24 @@
 #include "training.h"
 #include "trainingview.h"
 #include "recognitionview.h"
+#include "parameterview.h"
 #include "BallCommunication/ballcommunicationreal.h"
 #include "BallCommunication/ballcommunicationfake.h"
 #include "BallCommunication/databallcommunication.h"
 #include "GestureRecognition/gesturerecognition.h"
 #include <memory>
 #include <stdio.h>
+#include "config.h"
 
 using std::shared_ptr;
-
-// Define this as 1 if you don't have the ball ready
-#define FAKE_COMMUNICATION 0
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    qRegisterMetaType<UINT>("UINT");
 
 #if FAKE_COMMUNICATION
     BallCommunicationBase* ballCommunication = new BallCommunicationFake(this);
@@ -43,9 +44,12 @@ MainWindow::MainWindow(QWidget *parent) :
     recognitionView->initialize(gestureRecognition);
     recognitionView->setDataSource(ballCommunication);
 
+    ParameterView* parameterView = new ParameterView(this);
+
     ui->trainingLayout->addWidget(trainingView);
     ui->monitorLayout->addWidget(monitorView);
     ui->recognitionLayout->addWidget(recognitionView);
+    ui->parameterLayout->addWidget(parameterView);
 
     connect(monitorView, SIGNAL(signalSourceChanged(BallCommunicationBase*)), recognitionView, SLOT(onSignalSourceChanged(BallCommunicationBase*)));
     connect(monitorView, SIGNAL(signalSourceChanged(BallCommunicationBase*)), gestureRecognition, SLOT(onDataSourceChanged(BallCommunicationBase*)));

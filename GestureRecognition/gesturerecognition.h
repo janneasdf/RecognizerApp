@@ -41,7 +41,7 @@ private:
     QFutureWatcher<void>* recognitionWatcher;
 
     BallCommunicationBase* ballCommunication = 0;
-    MatrixDouble getReceivedData();
+    MatrixDouble getReceivedData(vector<float>& timestamps);
 
 public slots:
     void trainFromData(const QString& dataFolder, const QStringList& filenames);
@@ -51,7 +51,7 @@ private slots:
     void runRecognition();
 
 signals:
-    void gestureRecognitionResult(const QString& result);
+    void gestureRecognitionResult(const QString& result, UINT gesture, const QString& gestureName, float gestureStartTime, float gestureEndTime);
     void trainingStarted();
     void trainingCompleted();
     void trainingError(const QString& error);

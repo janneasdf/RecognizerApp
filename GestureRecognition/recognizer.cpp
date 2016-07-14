@@ -1,4 +1,5 @@
 #include "recognizer.h"
+#include "config.h"
 
 Recognizer::Recognizer(QObject *parent) : QObject(parent)
 {
@@ -23,22 +24,32 @@ void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData,
     emit trainingCompleted();
 }
 
-void Recognizer::runRecognition(MatrixDouble dataCopy)
+void Recognizer::runRecognition(MatrixDouble dataCopy, vector<float> timestamps)
 {
-    windowSize = 1000;
+    windowSize = config::RECOGNITION_WINDOW_SIZE;
 
     if (!pipeline.getTrained())
     {
-        emit recognitionResult(QString("Gesture recognition model hasn't been trained"));
+        emit recognitionResult(QString("Gesture recognition model hasn't been trained"), 0, "", 0, 0);
         return;
     }
-    if (dataCopy.getSize() < windowSize)
+    if (dataCopy.getNumRows() < windowSize)
     {
-        emit recognitionResult(QString("Not enough data for gesture prediction"));
+        emit recognitionResult(QString("Not enough data for gesture prediction"), 0, "", 0, 0);
         return;
     }
 
-    pipeline.predict(dataCopy);
+    /* Take windowSize amount of latest samples */
+    MatrixDouble dataInWindow;
+    size_t rows = dataCopy.getNumRows();
+    for (int i = 0; i < windowSize; ++i)
+    {
+        dataInWindow.push_back(dataCopy.getRowVector(rows - windowSize + i)); // col or row?
+    }
+    float firstGestureTime = timestamps[timestamps.size() - 1 - windowSize];
+    float lastGestureTime = timestamps[timestamps.size() - 1];
+
+    pipeline.predict(dataInWindow);
 
     UINT label = pipeline.getPredictedClassLabel();
 
@@ -47,5 +58,5 @@ void Recognizer::runRecognition(MatrixDouble dataCopy)
 
     QString gesture = QString::fromStdString(gestureNames.int_to_event_type(label));
 
-    emit recognitionResult(gesture);
+    emit recognitionResult(gesture, label, gesture, firstGestureTime, lastGestureTime);
 }

@@ -167,7 +167,9 @@ SOURCES += main.cpp\
     BallCommunication/ballcommunicationbase.cpp \
     BallCommunication/ballcommunicationfake.cpp \
     BallCommunication/databallcommunication.cpp \
-    BallCommunication/ballcommunicationreal.cpp
+    BallCommunication/ballcommunicationreal.cpp \
+    GestureRecognition/gestureinterpreter.cpp \
+    parameterview.cpp
 
 HEADERS  += mainwindow.h \
     BallCommunication/Libraries/SDL/include/begin_code.h \
@@ -389,12 +391,16 @@ HEADERS  += mainwindow.h \
     BallCommunication/ballcommunicationfake.h \
     BallCommunication/databallcommunication.h \
     BallCommunication/sensordataframe.h \
-    BallCommunication/ballcommunicationreal.h
+    BallCommunication/ballcommunicationreal.h \
+    GestureRecognition/gestureinterpreter.h \
+    config.h \
+    parameterview.h
 
 FORMS    += mainwindow.ui \
     monitorview.ui \
     trainingview.ui \
-    recognitionview.ui
+    recognitionview.ui \
+    parameterview.ui
 
 SUBDIRS += \
     BallCommunication/BallCommunication.pro \
