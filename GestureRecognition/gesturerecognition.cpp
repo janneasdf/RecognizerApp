@@ -4,7 +4,7 @@
 #include "event_type_converter.h"
 #include "GRT_helper.h"
 #include <QtConcurrent/QtConcurrent>
-#include "config.h"
+#include "recognitionconfig.h"
 
 GestureRecognition::GestureRecognition(QObject* parent) : QObject(parent)
 {
@@ -28,7 +28,7 @@ void GestureRecognition::trainFromData(const QString& trainingFolder, const QStr
         filenames_std.push_back(filename.toStdString());
     }
 //    vector<labeled_event_data> labeledData = read_labeled_training_data(trainingFolder.toStdString(), filenames_std);
-    float gestureWindowSize = config::GESTURE_WINDOW_SIZE;
+    float gestureWindowSize = RecognitionConfigFactory::getInstance().getGestureWindow();
     vector<labeled_event_data> labeledData = parse_helpers::read_labeled_training_data_separate(trainingFolder.toStdString(), filenames_std, gestureWindowSize);
     event_type_converter eventTypeConverter;
     eventTypeConverter.initialize(labeledData);

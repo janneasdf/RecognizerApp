@@ -11,6 +11,9 @@
 using std::string;
 using std::vector;
 
+/* This class contains the logic for setting up a gesture classifier
+ * using it.
+ */
 class Recognizer : public QObject
 {
     Q_OBJECT

@@ -11,7 +11,7 @@
 #include "GestureRecognition/gesturerecognition.h"
 #include <memory>
 #include <stdio.h>
-#include "config.h"
+#include "recognitionconfig.h"
 
 using std::shared_ptr;
 

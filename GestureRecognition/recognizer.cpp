@@ -1,5 +1,5 @@
 #include "recognizer.h"
-#include "config.h"
+#include "recognitionconfig.h"
 
 Recognizer::Recognizer(QObject *parent) : QObject(parent)
 {
@@ -26,7 +26,7 @@ void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData,
 
 void Recognizer::runRecognition(MatrixDouble dataCopy, vector<float> timestamps)
 {
-    windowSize = config::RECOGNITION_WINDOW_SIZE;
+    windowSize = RecognitionConfigFactory::getInstance().getRecognitionWindow();
 
     if (!pipeline.getTrained())
     {
