@@ -13,6 +13,10 @@ ParameterView::ParameterView(QWidget *parent) :
     classifierNameTypeMap.insert(std::make_pair(dtwChoice, GestureClassifierType::DTW));
     classifierNameTypeMap.insert(std::make_pair(dhmmChoice, GestureClassifierType::DHMM));
     classifierNameTypeMap.insert(std::make_pair(chmmChoice, GestureClassifierType::CHMM));
+
+    ui->classifierTypeComboBox->addItem(dtwChoice);
+    ui->classifierTypeComboBox->addItem(dhmmChoice);
+    ui->classifierTypeComboBox->addItem(chmmChoice);
 }
 
 ParameterView::~ParameterView()

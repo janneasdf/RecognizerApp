@@ -20,22 +20,25 @@ GestureClassifierType RecognitionConfig::getClassifier()
 
 void RecognitionConfig::setGestureWindow(float seconds)
 {
-    QMutexLocker locker(&parameterMutex);
+    parameterMutex.lock();
     gestureWindow = seconds;
+    parameterMutex.unlock();
     emit parametersChanged();
 }
 
 void RecognitionConfig::setRecognitionWindow(float seconds)
 {
-    QMutexLocker locker(&parameterMutex);
+    parameterMutex.lock();
     recognitionWindow = seconds;
+    parameterMutex.unlock();
     emit parametersChanged();
 }
 
 void RecognitionConfig::setClassifier(GestureClassifierType classifier)
 {
-    QMutexLocker locker(&parameterMutex);
+    parameterMutex.lock();
     classifierType = classifier;
+    parameterMutex.unlock();
     emit parametersChanged();
 }
 
