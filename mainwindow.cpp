@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     recognitionView->setDataSource(ballCommunication);
 
     ParameterView* parameterView = new ParameterView(this);
+    parameterView->initialize(gestureRecognition);
 
     ui->trainingLayout->addWidget(trainingView);
     ui->monitorLayout->addWidget(monitorView);

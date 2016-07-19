@@ -12,6 +12,12 @@ float RecognitionConfig::getRecognitionWindow()
     return recognitionWindow;
 }
 
+float RecognitionConfig::getTargetRecognitionInterval()
+{
+    QMutexLocker locker(&parameterMutex);
+    return targetRecognitionInterval;
+}
+
 GestureClassifierType RecognitionConfig::getClassifier()
 {
     QMutexLocker locker(&parameterMutex);
@@ -30,6 +36,14 @@ void RecognitionConfig::setRecognitionWindow(float seconds)
 {
     parameterMutex.lock();
     recognitionWindow = seconds;
+    parameterMutex.unlock();
+    emit parametersChanged();
+}
+
+void RecognitionConfig::setTargetRecognitionInterval(float seconds)
+{
+    parameterMutex.lock();
+    targetRecognitionInterval = seconds;
     parameterMutex.unlock();
     emit parametersChanged();
 }

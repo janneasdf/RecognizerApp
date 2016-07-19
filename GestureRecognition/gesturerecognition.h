@@ -52,6 +52,7 @@ private slots:
 
 signals:
     void gestureRecognitionResult(const QString& result, UINT gesture, const QString& gestureName, float gestureStartTime, float gestureEndTime);
+    void gestureRecognitionError(const QString& message);
     void trainingStarted();
     void trainingCompleted();
     void trainingError(const QString& error);

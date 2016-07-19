@@ -24,16 +24,21 @@ void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData,
 
 void Recognizer::runRecognition(MatrixDouble dataCopy, vector<float> timestamps)
 {
+    if (dataCopy.getNumRows() != timestamps.size())
+    {
+        throw std::invalid_argument("Gesture data and timestamp data must be same length. ");
+    }
+
     windowSize = RecognitionConfigFactory::getInstance().getRecognitionWindow();
 
     if (!pipeline.getTrained())
     {
-        emit recognitionResult(QString("Gesture recognition model hasn't been trained"), 0, "", 0, 0);
+        emit recognitionError(QString("Gesture recognition model hasn't been trained"));
         return;
     }
     if (dataCopy.getNumRows() < windowSize)
     {
-        emit recognitionResult(QString("Not enough data for gesture prediction"), 0, "", 0, 0);
+        emit recognitionError(QString("Not enough data for gesture prediction"));
         return;
     }
 
@@ -64,10 +69,6 @@ void Recognizer::updateParameters(GestureClassifierType classifierType, int down
 {
     static QMutex paramMutex;
     QMutexLocker locker(&paramMutex);
-
-//    auto x = setup_HMM(10, false);
-//    classifier = std::make_unique<Classifier>(x);
-//    pipeline.setClassifier(x);
 
     switch (classifierType)
     {

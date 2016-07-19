@@ -45,6 +45,7 @@ private slots:
     void clearGraph();
     void updateLagInfo();
     void onRecognitionResult(const QString& result, UINT label, const QString& gestureName, float gestureStartTime, float gestureEndTime);
+    void onRecognitionError(const QString& message);
 };
 
 #endif // RECOGNITIONVIEW_H

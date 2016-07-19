@@ -42,6 +42,7 @@ signals:
     void trainingError(const QString& error);
 
     void recognitionResult(const QString& result, UINT gesture, const QString& gestureName, float gestureStartTime, float gestureEndTime);
+    void recognitionError(const QString& message);
 
 };
 

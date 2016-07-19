@@ -21,6 +21,7 @@ void RecognitionView::initialize(GestureRecognition* gestureRecognition)
 
     // Update gesture recognition result (predicted gesture)
     connect(gestureRecognition, SIGNAL(gestureRecognitionResult(QString, UINT, QString, float, float)), this, SLOT(onRecognitionResult(QString, UINT, QString, float, float)));
+    connect(gestureRecognition, SIGNAL(gestureRecognitionError(QString)), this, SLOT(onRecognitionError(QString)));
 
     previousPrediction = QDateTime::currentMSecsSinceEpoch();
 }
@@ -127,18 +128,23 @@ void RecognitionView::onRecognitionResult(const QString& result, UINT label, con
     ui->predictionLagLabel->setText(QString("Prediction lag: ") + QString::number(timeSinceLastPrediction) + "ms");
     previousPrediction = QDateTime::currentMSecsSinceEpoch();
 
-    // Check for no gesture
+    // Check for no gesture (zero or under means no gesture)
     if (label < 1)
         return;
 
     // Add vertical line(s) into graph to indicate gesture (start and end)
-    (void)gestureStartTime;
+    // (not tested yet)
     sensorPlot->addGraph();
     sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureStartTime, -99999);
     sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureStartTime+0.001, 99999);
     sensorPlot->addGraph();
     sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureEndTime, -99999);
     sensorPlot->graph(sensorPlot->graphCount() - 1)->addData(gestureEndTime+0.001, 99999);
+}
+
+void RecognitionView::onRecognitionError(const QString &message)
+{
+    ui->predictionLabel->setText(message);
 }
 
 RecognitionView::~RecognitionView()

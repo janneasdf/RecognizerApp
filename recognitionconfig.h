@@ -23,7 +23,7 @@ class RecognitionConfig : public QObject
 {
     Q_OBJECT
 public:
-    explicit RecognitionConfig(QObject* parent = 0) : gestureWindow(0.5), recognitionWindow(1.0),
+    explicit RecognitionConfig(QObject* parent = 0) : gestureWindow(0.5), recognitionWindow(1.0), targetRecognitionInterval(0.1),
         classifierType(GestureClassifierType::DTW)
     {
     }
@@ -36,16 +36,21 @@ public:
     // consider for trying to detect a gesture.
     float getRecognitionWindow();
 
+    // How often to (try to) run gesture recognition
+    float getTargetRecognitionInterval();
+
     // Currently used classifying algorithm (DTW, DHMM or CHMM).
     GestureClassifierType getClassifier();
 
     void setGestureWindow(float seconds);
     void setRecognitionWindow(float seconds);
+    void setTargetRecognitionInterval(float seconds);
     void setClassifier(GestureClassifierType classifier);
 
 private:
     float gestureWindow;
     float recognitionWindow;
+    float targetRecognitionInterval;
     GestureClassifierType classifierType;
 
     QMutex parameterMutex;
@@ -57,7 +62,7 @@ signals:
 
 
 // Factory class for creating and accessing an instance of
-// RecognitionConfig.
+// RecognitionConfig. Slightly nicer than "Singleton" pattern.
 class RecognitionConfigFactory
 {
 public:

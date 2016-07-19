@@ -27,12 +27,15 @@ ParameterView::~ParameterView()
 void ParameterView::initialize(GestureRecognition *gestureRecognition)
 {
     this->gestureRecognition = gestureRecognition;
+    auto& config = RecognitionConfigFactory::getInstance();
+    ui->samplingWindowSpinBox->setValue(config.getRecognitionWindow());
+    ui->recognitionIntervalSpinbox->setValue(config.getTargetRecognitionInterval());
 }
 
 void ParameterView::on_applyChangesButton_clicked()
 {
-    float recognitionWindow = ui->samplingWindowSpinBox->value();
     auto& config = RecognitionConfigFactory::getInstance();
-    config.setRecognitionWindow(recognitionWindow);
+    config.setRecognitionWindow(ui->samplingWindowSpinBox->value());
+    config.setTargetRecognitionInterval(ui->recognitionIntervalSpinbox->value());
     config.setClassifier(classifierNameTypeMap[ui->classifierTypeComboBox->currentText().toStdString()]);
 }

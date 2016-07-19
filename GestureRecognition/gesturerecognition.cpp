@@ -12,6 +12,7 @@ GestureRecognition::GestureRecognition(QObject* parent) : QObject(parent)
     connect(&recognizer, SIGNAL(trainingCompleted()), this, SIGNAL(trainingCompleted()));
     connect(&recognizer, SIGNAL(recognitionResult(QString, UINT, QString, float, float)),
             this, SIGNAL(gestureRecognitionResult(QString, UINT, QString, float, float)));
+    connect(&recognizer, SIGNAL(recognitionError(QString)), this, SIGNAL(gestureRecognitionError(QString)));
 
     gestureRecognitionTimer.start(100);
     connect(&gestureRecognitionTimer, SIGNAL(timeout()), this, SLOT(runRecognition()));
@@ -68,7 +69,8 @@ void GestureRecognition::updateRecognizerParameters()
     auto& config = RecognitionConfigFactory::getInstance();
     GestureClassifierType classifierType = config.getClassifier();
     recognitionWatcher->cancel();
-    recognizer.updateParameters(classifierType, 10); // todo maybe have to make sure recognition doesn't start right before (with a mutex)
+    recognizer.updateParameters(classifierType, 10);
+    gestureRecognitionTimer.setInterval(0.001 * config.getTargetRecognitionInterval());
 }
 
 void GestureRecognition::startRecognition()
