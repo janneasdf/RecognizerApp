@@ -11,9 +11,6 @@ void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData,
     emit trainingStarted();
     try
     {
-//        classifier = std::make_unique<HMM>(setup_HMM(5));
-//        pipeline.setClassifier(*classifier.get());
-        (*classifier).clear();
         pipeline.train(trainingData);
     }
     catch (const std::exception& e)
@@ -68,16 +65,18 @@ void Recognizer::updateParameters(GestureClassifierType classifierType, int down
     static QMutex paramMutex;
     QMutexLocker locker(&paramMutex);
 
+//    auto x = setup_HMM(10, false);
+//    classifier = std::make_unique<Classifier>(x);
+//    pipeline.setClassifier(x);
+
     switch (classifierType)
     {
     case GestureClassifierType::DTW:
-        classifier = std::make_unique<Classifier>(setup_DTW());
-        pipeline.setClassifier(*classifier.get());
+        pipeline.setClassifier(setup_DTW());
         break;
     case GestureClassifierType::DHMM:
     case GestureClassifierType::CHMM:
-        classifier = std::make_unique<Classifier>(setup_HMM(downsampleFactor, classifierType == GestureClassifierType::CHMM));
-        pipeline.setClassifier(*classifier.get());
+        pipeline.setClassifier(setup_HMM(downsampleFactor, classifierType == GestureClassifierType::CHMM));
     }
     // Note: pipeline needs to be re-trained (by user)
 

@@ -30,7 +30,6 @@ public:
 
 private:
     GestureRecognitionPipeline pipeline;
-    std::unique_ptr<Classifier> classifier;
 
     event_type_converter gestureNames;
 
