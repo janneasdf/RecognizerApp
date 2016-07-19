@@ -30,23 +30,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox">
-       <item>
-        <property name="text">
-         <string>Dynamic time warping (DTW)</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Discrete Hidden Markov Model (DHMM)</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Continuous Hidden Markov Model (CHMM)</string>
-        </property>
-       </item>
-      </widget>
+      <widget class="QComboBox" name="classifierTypeComboBox"/>
      </item>
     </layout>
    </item>
@@ -63,12 +47,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+      <widget class="QDoubleSpinBox" name="samplingWindowSpinBox"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="applyChangesButton">
      <property name="text">
       <string>Apply changes</string>
      </property>

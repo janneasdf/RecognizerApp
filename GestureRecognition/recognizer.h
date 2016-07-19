@@ -3,10 +3,11 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 #include <QObject>
 #include <QFutureWatcher>
 #include "GRT_helper.h"
-#include <string>
+#include "recognitionconfig.h"
 
 using std::string;
 using std::vector;
@@ -25,9 +26,11 @@ public:
 
     void Recognizer::runRecognition(MatrixDouble dataCopy, vector<float> timestamps);
 
+    void updateParameters(GestureClassifierType classifierType, int downsampleFactor);
+
 private:
     GestureRecognitionPipeline pipeline;
-    std::unique_ptr<HMM> hmm;
+    std::unique_ptr<Classifier> classifier;
 
     event_type_converter gestureNames;
 
@@ -40,8 +43,6 @@ signals:
     void trainingError(const QString& error);
 
     void recognitionResult(const QString& result, UINT gesture, const QString& gestureName, float gestureStartTime, float gestureEndTime);
-
-public slots:
 
 };
 

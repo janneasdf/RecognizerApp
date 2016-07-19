@@ -1,18 +1,19 @@
 #include "recognizer.h"
-#include "recognitionconfig.h"
 
 Recognizer::Recognizer(QObject *parent) : QObject(parent)
 {
     pipeline.addPreProcessingModule(MovingAverageFilter(5, 2));
 }
 
-void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData, event_type_converter gestureNames)
+void Recognizer::trainFromData(const TimeSeriesClassificationData& trainingData,
+                               event_type_converter gestureNames)
 {
     emit trainingStarted();
     try
     {
-        hmm = std::make_unique<HMM>(setup_HMM(5));
-        pipeline.setClassifier(*hmm.get());
+//        classifier = std::make_unique<HMM>(setup_HMM(5));
+//        pipeline.setClassifier(*classifier.get());
+        (*classifier).clear();
         pipeline.train(trainingData);
     }
     catch (const std::exception& e)
@@ -59,4 +60,25 @@ void Recognizer::runRecognition(MatrixDouble dataCopy, vector<float> timestamps)
     QString gesture = QString::fromStdString(gestureNames.int_to_event_type(label));
 
     emit recognitionResult(gesture, label, gesture, firstGestureTime, lastGestureTime);
+    //todo try fake results to test graph vertical line thing
+}
+
+void Recognizer::updateParameters(GestureClassifierType classifierType, int downsampleFactor)
+{
+    static QMutex paramMutex;
+    QMutexLocker locker(&paramMutex);
+
+    switch (classifierType)
+    {
+    case GestureClassifierType::DTW:
+        classifier = std::make_unique<Classifier>(setup_DTW());
+        pipeline.setClassifier(*classifier.get());
+        break;
+    case GestureClassifierType::DHMM:
+    case GestureClassifierType::CHMM:
+        classifier = std::make_unique<Classifier>(setup_HMM(downsampleFactor, classifierType == GestureClassifierType::CHMM));
+        pipeline.setClassifier(*classifier.get());
+    }
+    // Note: pipeline needs to be re-trained (by user)
+
 }

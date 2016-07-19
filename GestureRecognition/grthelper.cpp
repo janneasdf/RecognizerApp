@@ -36,9 +36,9 @@ TimeSeriesClassificationData extract_training_data(const vector<labeled_event_da
     return training_data;
 }
 
-HMM setup_HMM(int downsample_factor) {
+HMM setup_HMM(int downsample_factor, bool continuous) {
     HMM hmm = HMM();
-    hmm.setHMMType(HMMTypes::HMM_CONTINUOUS);
+    hmm.setHMMType(continuous ? HMMTypes::HMM_CONTINUOUS : HMMTypes::HMM_DISCRETE);
     hmm.setDownsampleFactor(downsample_factor);
     hmm.setCommitteeSize(10);
     hmm.setAutoEstimateSigma(true);

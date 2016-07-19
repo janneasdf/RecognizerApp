@@ -5,36 +5,56 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+/* Enumeration for the different available classifiers
+ * (Dynamic time warp, Discrete Hidden Markov Model,
+ * Continuous HMM).
+ */
+enum GestureClassifierType
+{
+    DTW,
+    DHMM,
+    CHMM
+};
+
 /* QThread-safe class for setting and updating
  * parameters for gesture recognition.
  */
-class RecognitionConfig : QObject
+class RecognitionConfig : public QObject
 {
     Q_OBJECT
 public:
-    RecognitionConfig()
+    explicit RecognitionConfig(QObject* parent = 0) : gestureWindow(0.5), recognitionWindow(1.0),
+        classifierType(GestureClassifierType::DTW)
     {
-        gestureWindow = 0.5;
-        recognitionWindow = 1.0;
     }
 
-    // Amount of data (in milliseconds) to take around
+    // Amount of data (in seconds) to take around
     // event markers for gesture data
     float getGestureWindow();
 
-    // Amount of most recent data (in milliseconds) to
-    // consider for trying to detect a gesture
+    // Amount of most recent data (in seconds) to
+    // consider for trying to detect a gesture.
     float getRecognitionWindow();
+
+    // Currently used classifying algorithm (DTW, DHMM or CHMM).
+    GestureClassifierType getClassifier();
 
     void setGestureWindow(float seconds);
     void setRecognitionWindow(float seconds);
+    void setClassifier(GestureClassifierType classifier);
 
 private:
     float gestureWindow;
     float recognitionWindow;
+    GestureClassifierType classifierType;
 
     QMutex parameterMutex;
+
+signals:
+    // Used for notifying when any parameters have been changed.
+    void parametersChanged();
 };
+
 
 // Factory class for creating and accessing an instance of
 // RecognitionConfig.

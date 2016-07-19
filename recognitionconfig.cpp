@@ -12,14 +12,30 @@ float RecognitionConfig::getRecognitionWindow()
     return recognitionWindow;
 }
 
+GestureClassifierType RecognitionConfig::getClassifier()
+{
+    QMutexLocker locker(&parameterMutex);
+    return classifierType;
+}
+
 void RecognitionConfig::setGestureWindow(float seconds)
 {
     QMutexLocker locker(&parameterMutex);
     gestureWindow = seconds;
+    emit parametersChanged();
 }
 
 void RecognitionConfig::setRecognitionWindow(float seconds)
 {
     QMutexLocker locker(&parameterMutex);
     recognitionWindow = seconds;
+    emit parametersChanged();
 }
+
+void RecognitionConfig::setClassifier(GestureClassifierType classifier)
+{
+    QMutexLocker locker(&parameterMutex);
+    classifierType = classifier;
+    emit parametersChanged();
+}
+

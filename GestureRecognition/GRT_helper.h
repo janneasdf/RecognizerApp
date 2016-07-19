@@ -22,7 +22,7 @@ TimeSeriesClassificationData extract_training_data(const vector<labeled_event_da
     const event_type_converter& event_type_converter);
 
 /* Create a Hidden Markov Model classifier and setup its parameters */
-HMM setup_HMM(int downsample_factor);
+HMM setup_HMM(int downsample_factor, bool continuous);
 
 DTW setup_DTW();
 

@@ -10,13 +10,20 @@ GestureRecognition::GestureRecognition(QObject* parent) : QObject(parent)
 {
     connect(&recognizer, SIGNAL(trainingStarted()), this, SIGNAL(trainingStarted()));
     connect(&recognizer, SIGNAL(trainingCompleted()), this, SIGNAL(trainingCompleted()));
-    connect(&recognizer, SIGNAL(recognitionResult(QString, UINT, QString, float, float)), this, SIGNAL(gestureRecognitionResult(QString, UINT, QString, float, float)));
+    connect(&recognizer, SIGNAL(recognitionResult(QString, UINT, QString, float, float)),
+            this, SIGNAL(gestureRecognitionResult(QString, UINT, QString, float, float)));
 
     gestureRecognitionTimer.start(100);
     connect(&gestureRecognitionTimer, SIGNAL(timeout()), this, SLOT(runRecognition()));
 
     // For concurrent (asynchronous) gesture recognition
     recognitionWatcher = new QFutureWatcher<void>(this);
+
+    // Listen to parameter changes and apply them to the recognizer
+    connect(&RecognitionConfigFactory::getInstance(), SIGNAL(parametersChanged()), this,
+            SLOT(updateRecognizerParameters()));
+    // Initialize recognition parameters
+    updateRecognizerParameters();
 }
 
 void GestureRecognition::trainFromData(const QString& trainingFolder, const QStringList& filenames)
@@ -29,7 +36,9 @@ void GestureRecognition::trainFromData(const QString& trainingFolder, const QStr
     }
 //    vector<labeled_event_data> labeledData = read_labeled_training_data(trainingFolder.toStdString(), filenames_std);
     float gestureWindowSize = RecognitionConfigFactory::getInstance().getGestureWindow();
-    vector<labeled_event_data> labeledData = parse_helpers::read_labeled_training_data_separate(trainingFolder.toStdString(), filenames_std, gestureWindowSize);
+    vector<labeled_event_data> labeledData =
+            parse_helpers::read_labeled_training_data_separate(trainingFolder.toStdString(),
+                                                               filenames_std, gestureWindowSize);
     event_type_converter eventTypeConverter;
     eventTypeConverter.initialize(labeledData);
     TimeSeriesClassificationData grtData = extract_training_data(labeledData, eventTypeConverter);
@@ -51,12 +60,15 @@ void GestureRecognition::runRecognition()
         vector<float> timestamps;
         MatrixDouble data = getReceivedData(timestamps);
         recognizer.runRecognition(data, timestamps);
-    }));
+                                                    }));
 }
 
-void GestureRecognition::setParameters()
+void GestureRecognition::updateRecognizerParameters()
 {
-
+    auto& config = RecognitionConfigFactory::getInstance();
+    GestureClassifierType classifierType = config.getClassifier();
+    recognitionWatcher->cancel();
+    recognizer.updateParameters(classifierType, 10); // todo maybe have to make sure recognition doesn't start right before (with a mutex)
 }
 
 void GestureRecognition::startRecognition()

@@ -26,8 +26,6 @@ class GestureRecognition : public QObject
 public:
     explicit GestureRecognition(QObject* parent = 0);
 
-    // Training related functions
-    void setParameters();
 
     // Real-time recognition related functions
     void startRecognition();
@@ -49,6 +47,8 @@ public slots:
 
 private slots:
     void runRecognition();
+
+    void updateRecognizerParameters();
 
 signals:
     void gestureRecognitionResult(const QString& result, UINT gesture, const QString& gestureName, float gestureStartTime, float gestureEndTime);
